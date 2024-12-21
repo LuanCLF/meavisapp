@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meavisapp/pages/about.dart';
 import 'package:meavisapp/pages/home.dart';
 import 'package:meavisapp/pages/profile.dart';
+import 'package:meavisapp/pages/register.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,9 +18,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green.shade900,
-        ),
+            seedColor: Colors.blue.shade900, brightness: Brightness.light),
       ),
+      routes: {
+        '/home': (context) => const Home(),
+        '/profile': (context) => const Profile(),
+        '/about': (context) => const About(),
+        '/register': (context) => const Register(),
+      },
       home: const MyPage(),
     );
   }

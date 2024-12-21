@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class Profile extends StatelessWidget {
-  const Profile({super.key});
+class Register extends StatelessWidget {
+  const Register({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('Welcome to Profile Page'),
+        child: Text('Welcome to Register Page'),
       ),
     );
   }
