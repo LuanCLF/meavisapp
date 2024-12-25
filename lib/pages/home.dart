@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:meavisapp/pages/register.dart';
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  final VoidCallback onRegister;
+
+  const Home({super.key, required this.onRegister});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +36,9 @@ class Home extends StatelessWidget {
                   ),
                 ),
               ),
-              Btn(),
+              Btn(
+                onRegister: onRegister,
+              ),
               SizedBox(
                 width: 300,
                 child: Column(children: <Widget>[
@@ -107,8 +110,10 @@ class IcnText extends StatelessWidget {
 }
 
 class Btn extends StatelessWidget {
+  final VoidCallback onRegister;
   const Btn({
     super.key,
+    required this.onRegister,
   });
 
   @override
@@ -117,23 +122,17 @@ class Btn extends StatelessWidget {
       width: 150,
       height: 50,
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: Text('Cadastro'),
-                ),
-                body: Register(),
-              ),
-            ),
-          );
-        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(
+            Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        onPressed: onRegister,
         child: Text(
           'Receber',
           style: TextStyle(
             fontSize: 16,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ),
