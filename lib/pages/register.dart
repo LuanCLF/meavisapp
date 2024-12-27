@@ -32,6 +32,8 @@ class _RegisterState extends State<Register> {
   List<String> userPreferenceCategory = ["Obras"];
   String? userLocation;
 
+  bool _isLoading = false;
+
   List<String> errors = [];
 
   void validatePreferenceCategory() {
@@ -171,7 +173,7 @@ class _RegisterState extends State<Register> {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 50,
+                        height: 30,
                       ),
                       Text(
                         'Saiba Tudo',
@@ -185,10 +187,10 @@ class _RegisterState extends State<Register> {
                       SizedBox(
                         width: 250,
                         child: Text(
-                          'Cadastre o que quer saber e receba onde precisa!',
+                          'Receba apenas o necessário!',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 16,
                           ),
                         ),
                       ),
@@ -230,7 +232,7 @@ class _RegisterState extends State<Register> {
                                       if (errors.contains("category") &&
                                           userPreferenceCategory.isEmpty)
                                         Text(
-                                          "Selecione ao menos \n uma categoria",
+                                          "Selecione ao menos\numa categoria",
                                           style: TextStyle(
                                             color: Theme.of(context)
                                                 .colorScheme
@@ -286,7 +288,7 @@ class _RegisterState extends State<Register> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                              "Selecione o meio \n de notificação:"),
+                                              "Selecione o meio\nde notificação:"),
                                           Row(
                                             children: [
                                               Checkbox(
@@ -547,9 +549,6 @@ class _RegisterState extends State<Register> {
                                 ],
                               ),
                               SizedBox(
-                                height: 10,
-                              ),
-                              SizedBox(
                                 width: 150,
                                 height: 50,
                                 child: ElevatedButton(
@@ -568,14 +567,13 @@ class _RegisterState extends State<Register> {
                                         validateWhatsapp(null);
                                         validatePassword(null);
                                         if (errors.isEmpty) {
+                                          _isLoading = true;
+
                                           logger.i(
                                               "RegisterPage: Formulário válido");
-                                          final controller =
-                                              Provider.of<Registercontroller>(
-                                                  context,
-                                                  listen: false);
 
-                                          controller.registerUser(User(
+                                          Registercontroller()
+                                              .registerUser(User(
                                             name: formatName().trim(),
                                             email: emailController.text,
                                             whatsapp: whatsappController.text
@@ -586,8 +584,10 @@ class _RegisterState extends State<Register> {
                                             preferenceNotification:
                                                 preferenceNotification,
                                           ));
+
+                                          widget.onClose();
                                         } else {
-                                          logger.i(
+                                          logger.e(
                                               "RegisterPage: Formulário inválido");
                                         }
                                       } catch (e) {
@@ -595,17 +595,27 @@ class _RegisterState extends State<Register> {
                                             "RegisterPage: Erro no cadastro => $e");
                                         errors.add("form");
                                       }
+                                      _isLoading = false;
                                     });
                                   },
-                                  child: Text(
-                                    "Cadastrar",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary,
-                                    ),
-                                  ),
+                                  child: _isLoading
+                                      ? CircularProgressIndicator(
+                                          strokeWidth: 3,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary),
+                                        )
+                                      : Text(
+                                          'Cadastrar',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                          ),
+                                        ),
                                 ),
                               ),
                               if (errors.contains("form"))
