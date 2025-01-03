@@ -31,6 +31,38 @@ class UserRepository {
       throw "UserRepository-registerUser: Erro registrando usuário => $e";
     }
   }
+
+  Future<User?> findUserByEmail(String email) async {
+    try {
+      await _init();
+      var user = await Database.findUserByEmail(email);
+      logger.i("UserRepository-findUserByEmail: Usuário encontrado",
+          time: DateTime.now());
+      return user;
+    } catch (e) {
+      logger.e(
+        "UserRepository-findUserByEmail: Erro buscando usuário => $e",
+        time: DateTime.now(),
+      );
+      throw "UserRepository-findUserByEmail: Erro buscando usuário => $e";
+    }
+  }
+
+  Future<User?> findUserByWhatsapp(String whatsapp) async {
+    try {
+      await _init();
+      var user = await Database.findUserByWhatsapp(whatsapp);
+      logger.i("UserRepository-findUserByWhatsapp: Usuário encontrado",
+          time: DateTime.now());
+      return user;
+    } catch (e) {
+      logger.e(
+        "UserRepository-findUserByWhatsapp: Erro buscando usuário => $e",
+        time: DateTime.now(),
+      );
+      throw "UserRepository-findUserByWhatsapp: Erro buscando usuário => $e";
+    }
+  }
 }
 
 class CategorieRepository {

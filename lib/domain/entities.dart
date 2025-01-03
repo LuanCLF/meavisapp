@@ -2,7 +2,7 @@ import 'package:meavisapp/domain/interfaces.dart';
 
 class User implements IUser {
   @override
-  int? id;
+  String? id;
   @override
   final String name;
   @override
@@ -26,8 +26,10 @@ class User implements IUser {
     this.location,
     this.email,
     this.whatsapp,
+    this.id,
   });
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -39,6 +41,46 @@ class User implements IUser {
       'whatsapp': whatsapp,
     };
   }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['_id'].toString(),
+      name: json['name'],
+      password: json['password'],
+      categories: List<String>.from(json['categories']),
+      preferenceNotification: json['preferenceNotification'],
+      location: json['location'],
+      email: json['email'],
+      whatsapp: json['whatsapp'],
+    );
+  }
+}
+
+class UserLogged implements IUserLogged {
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  String? email;
+  @override
+  String? whatsapp;
+  @override
+  final String? location;
+  @override
+  final List<String> categories;
+  @override
+  final String preferenceNotification;
+
+  UserLogged({
+    required this.id,
+    required this.name,
+    this.email,
+    this.whatsapp,
+    this.location,
+    required this.categories,
+    required this.preferenceNotification,
+  });
 }
 
 class Location implements ILocation {

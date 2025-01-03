@@ -40,4 +40,46 @@ class Database {
       throw 'Database: Erro cadastrando usuário => $e';
     }
   }
+
+  static Future<User?> findUserByEmail(String email) async {
+    try {
+      userCollection = _db!.collection("users");
+
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      if (userCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+
+      var user = await userCollection!.findOne({"email": email});
+      Database._logger.i("Database: Usuário encontrado => $user");
+      return user == null ? null : User.fromJson(user);
+    } catch (e) {
+      Database._logger.e("Database: Erro buscando usuário => $e");
+      throw 'Database: Erro buscando usuário => $e';
+    }
+  }
+
+  static Future<User?> findUserByWhatsapp(String whatsapp) async {
+    try {
+      userCollection = _db!.collection("users");
+
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      if (userCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+
+      var user = await userCollection!.findOne({"whatsapp": whatsapp});
+      Database._logger.i("Database: Usuário encontrado => $user");
+      return user == null ? null : User.fromJson(user);
+    } catch (e) {
+      Database._logger.e("Database: Erro buscando usuário => $e");
+      throw 'Database: Erro buscando usuário => $e';
+    }
+  }
 }

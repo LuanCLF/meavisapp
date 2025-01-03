@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 import 'package:meavisapp/controller/controller.dart';
+import 'package:meavisapp/domain/entities.dart';
 import 'package:meavisapp/pages/about.dart';
 import 'package:meavisapp/pages/home.dart';
 import 'package:meavisapp/pages/profile.dart';
 import 'package:meavisapp/pages/register.dart';
+import 'package:meavisapp/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -13,7 +15,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => Registercontroller()),
+        ChangeNotifierProvider(create: (_) => UserController()),
       ],
       child: MyApp(),
     ),
@@ -45,14 +47,17 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
+  UserController userController = UserController();
   int _selectedIndex = 0;
-  bool _isRegisterPageVisible = false;
   bool _isLoading = true;
+  UserLogged? _userLogged;
+  bool isLogged = false;
 
   @override
   void initState() {
     super.initState();
     _simulateLoading();
+    _onUserLogged();
   }
 
   void _simulateLoading() async {
@@ -65,13 +70,20 @@ class _MyPageState extends State<MyPage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _isRegisterPageVisible = false;
     });
   }
 
   void _openRegisterPage() {
     setState(() {
-      _isRegisterPageVisible = true;
+      _selectedIndex = 3;
+    });
+  }
+
+  void _onUserLogged() async {
+    await userController.getLoggedUser();
+    setState(() {
+      isLogged = userController.isLogged;
+      _userLogged = userController.userLogged;
     });
   }
 
@@ -101,17 +113,40 @@ class _MyPageState extends State<MyPage> {
                       onRegister: _openRegisterPage,
                     )
                   else if (_selectedIndex == 1)
-                    Profile()
+                    isLogged
+                        ? Profile(
+                            userLogged: _userLogged!,
+                            userController: userController,
+                            onLogout: () {
+                              _onUserLogged();
+                              _onItemTapped(0);
+                            },
+                          )
+                        : Login(
+                            userController: userController,
+                            onRegister: _openRegisterPage,
+                            userLogged: _userLogged,
+                            onLogin: () {
+                              _onUserLogged();
+                              _onItemTapped(1);
+                            },
+                          )
                   else if (_selectedIndex == 2)
-                    About(),
-                  if (_isRegisterPageVisible)
+                    About()
+                  else if (_selectedIndex == 3)
                     Register(
+                      userController: userController,
                       onClose: () {
-                        setState(() {
-                          _isRegisterPageVisible = false;
-                        });
+                        _onItemTapped(0);
                       },
-                    ),
+                      onSave: (UserLogged userLogged) {
+                        setState(() {
+                          _userLogged = userLogged;
+                        });
+                        _onItemTapped(1);
+                      },
+                    )
+                  // Substitua por sua outra página
                 ],
               ),
             ),
@@ -132,8 +167,12 @@ class _MyPageState extends State<MyPage> {
             label: 'Sobre',
           ),
         ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: _selectedIndex < 3 ? _selectedIndex : 1,
+        onTap: (index) {
+          if (index < 3) {
+            _onItemTapped(index);
+          }
+        },
       ),
     );
   }
