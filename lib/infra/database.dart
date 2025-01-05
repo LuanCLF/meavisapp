@@ -41,6 +41,40 @@ class Database {
     }
   }
 
+  static Future<void> updateUser(User user) async {
+    try {
+      userCollection = _db!.collection("users");
+
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      if (userCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+      Map<String, dynamic> result;
+      ObjectId id = ObjectId.parse(user.id!);
+      if (user.password.isEmpty) {
+        var userMap = await userCollection!.findOne({"_id": id});
+        user.password = userMap!['password'];
+        result = await userCollection!.update(
+          {"_id": id},
+          user.toJson(),
+        );
+      } else {
+        result = await userCollection!.update(
+          {"_id": id},
+          user.toJson(),
+        );
+      }
+
+      Database._logger.i("Database: Usuário atualizado => $result");
+    } catch (e) {
+      Database._logger.e("Database: Erro atualizando usuário => $e");
+      throw 'Database: Erro atualizando usuário => $e';
+    }
+  }
+
   static Future<User?> findUserByEmail(String email) async {
     try {
       userCollection = _db!.collection("users");
@@ -53,9 +87,11 @@ class Database {
         throw 'Conexão com userCollection falhou';
       }
 
-      var user = await userCollection!.findOne({"email": email});
+      var userMap = await userCollection!.findOne({"email": email});
+      User? user = userMap == null ? null : User.fromJson(userMap);
+
       Database._logger.i("Database: Usuário encontrado => $user");
-      return user == null ? null : User.fromJson(user);
+      return user;
     } catch (e) {
       Database._logger.e("Database: Erro buscando usuário => $e");
       throw 'Database: Erro buscando usuário => $e';
@@ -74,9 +110,12 @@ class Database {
         throw 'Conexão com userCollection falhou';
       }
 
-      var user = await userCollection!.findOne({"whatsapp": whatsapp});
+      var userMap = await userCollection!.findOne({"whatsapp": whatsapp});
+      User? user = userMap == null ? null : User.fromJson(userMap);
+
       Database._logger.i("Database: Usuário encontrado => $user");
-      return user == null ? null : User.fromJson(user);
+
+      return user;
     } catch (e) {
       Database._logger.e("Database: Erro buscando usuário => $e");
       throw 'Database: Erro buscando usuário => $e';

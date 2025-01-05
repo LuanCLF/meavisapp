@@ -47,6 +47,32 @@ class UserController extends ChangeNotifier {
     }
   }
 
+  Future<void> updateUser(User user) async {
+    try {
+      await _userRepository.updateUser(user);
+      await _saveInPreferences(user);
+      userLogged = UserLogged(
+        id: user.id!,
+        name: user.name,
+        categories: user.categories,
+        preferenceNotification: user.preferenceNotification,
+        email: user.email,
+        whatsapp: user.whatsapp,
+        location: user.location,
+      );
+
+      notifyListeners();
+
+      _logger.i("UserController-updateUser: Usuário atualizado",
+          time: DateTime.now());
+    } catch (e) {
+      _logger.e(
+        "UserController-updateUser: Erro atualizando usuário => $e",
+        time: DateTime.now(),
+      );
+    }
+  }
+
   Future<(String, int)> login(
       String loginId, String loginMethod, String password) async {
     try {
@@ -89,7 +115,12 @@ class UserController extends ChangeNotifier {
         userLogged = UserLogged(
           id: prefs.getString("id")!,
           name: prefs.getString("name")!,
-          categories: prefs.getString("categories")!.split(","),
+          categories: prefs
+              .getString("categories")!
+              .replaceAll("[", "")
+              .replaceAll("]", "")
+              .replaceAll(" ", "")
+              .split(","),
           preferenceNotification: prefs.getString("preferenceNotification")!,
           email: prefs.getString("email"),
           whatsapp: prefs.getString("whatsapp"),

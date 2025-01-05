@@ -6,7 +6,7 @@ class User implements IUser {
   @override
   final String name;
   @override
-  final String password;
+  String password;
   @override
   final List<String> categories;
   @override
@@ -29,6 +29,10 @@ class User implements IUser {
     this.id,
   });
 
+  void attId(String id) {
+    this.id = id;
+  }
+
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -44,7 +48,7 @@ class User implements IUser {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['_id'].toString(),
+      id: json['_id'].toHexString().toString(),
       name: json['name'],
       password: json['password'],
       categories: List<String>.from(json['categories']),
@@ -55,6 +59,8 @@ class User implements IUser {
     );
   }
 }
+
+
 
 class UserLogged implements IUserLogged {
   @override

@@ -32,6 +32,21 @@ class UserRepository {
     }
   }
 
+  Future updateUser(User user) async {
+    try {
+      await _init();
+      await Database.updateUser(user);
+      logger.i("UserRepository-updateUser: Usuário atualizado",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e(
+        "UserRepository-updateUser: Erro atualizando usuário => $e",
+        time: DateTime.now(),
+      );
+      throw "UserRepository-updateUser: Erro atualizando usuário => $e";
+    }
+  }
+
   Future<User?> findUserByEmail(String email) async {
     try {
       await _init();
