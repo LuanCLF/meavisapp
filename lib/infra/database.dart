@@ -75,7 +75,82 @@ class Database {
     }
   }
 
-  static Future<User?> findUserByEmail(String email) async {
+  static Future<(bool, bool)> checkIfUserExists(
+      String? email, String? whatsapp) async {
+    try {
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      userCollection = _db!.collection("users");
+
+      if (userCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+      bool userExistsEmail = false;
+      bool userExistsWhatsapp = false;
+
+      if (email != null) {
+        userExistsEmail =
+            await userCollection!.find({"email": email}).isEmpty == false;
+      }
+
+      if (whatsapp != null) {
+        userExistsWhatsapp =
+            await userCollection!.find({"whatsapp": whatsapp}).isEmpty == false;
+      }
+
+      Database._logger.i(
+          "Database: Usuário existe => Email: $userExistsEmail   Whatsapp: $userExistsWhatsapp");
+      return (userExistsEmail, userExistsWhatsapp);
+    } catch (e) {
+      Database._logger.e("Database: Erro verificando se usuário existe => $e");
+      throw 'Database: Erro verificando se usuário existe => $e';
+    }
+  }
+
+  static Future<(bool, bool)> checkIfUserExistsForUpdate(
+      String? email, String? whatsapp, String id) async {
+    try {
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      userCollection = _db!.collection("users");
+
+      if (userCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+
+      bool userExistsEmail = false;
+      bool userExistsWhatsapp = false;
+
+      if (email != null) {
+        int countEmail = await userCollection!.count({
+          "email": email,
+          "_id": {"\$ne": ObjectId.parse(id)}
+        });
+        userExistsEmail = countEmail > 0;
+      }
+
+      if (whatsapp != null) {
+        int countWhatsapp = await userCollection!.count({
+          "whatsapp": whatsapp,
+          "_id": {"\$ne": ObjectId.parse(id)}
+        });
+        userExistsWhatsapp = countWhatsapp > 0;
+      }
+
+      Database._logger.i(
+          "Database: Usuário existe => Email: $userExistsEmail, Whatsapp: $userExistsWhatsapp");
+      return (userExistsEmail, userExistsWhatsapp);
+    } catch (e) {
+      Database._logger.e("Database: Erro verificando se usuário existe => $e");
+      throw 'Database: Erro verificando se usuário existe => $e';
+    }
+  }
+
+  static Future<User?> findUser(String? email, String? whatsapp) async {
     try {
       userCollection = _db!.collection("users");
 
@@ -87,7 +162,10 @@ class Database {
         throw 'Conexão com userCollection falhou';
       }
 
-      var userMap = await userCollection!.findOne({"email": email});
+      Map<String, dynamic>? userMap = email != null
+          ? await userCollection!.findOne({"email": email})
+          : await userCollection!.findOne({"whatsapp": whatsapp});
+
       User? user = userMap == null ? null : User.fromJson(userMap);
 
       Database._logger.i("Database: Usuário encontrado => $user");
@@ -98,27 +176,13 @@ class Database {
     }
   }
 
-  static Future<User?> findUserByWhatsapp(String whatsapp) async {
+  static Future<void> close() async {
     try {
-      userCollection = _db!.collection("users");
-
-      if (_db == null || !_db!.isConnected) {
-        throw 'Banco de dados não conectado';
-      }
-
-      if (userCollection == null) {
-        throw 'Conexão com userCollection falhou';
-      }
-
-      var userMap = await userCollection!.findOne({"whatsapp": whatsapp});
-      User? user = userMap == null ? null : User.fromJson(userMap);
-
-      Database._logger.i("Database: Usuário encontrado => $user");
-
-      return user;
+      await _db!.close();
+      Database._logger.i("Database-close: Conexão com banco de dados fechada");
     } catch (e) {
-      Database._logger.e("Database: Erro buscando usuário => $e");
-      throw 'Database: Erro buscando usuário => $e';
+      Database._logger
+          .e("Database-close: Erro fechando conexão com banco de dados => $e");
     }
   }
 }

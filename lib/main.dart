@@ -75,7 +75,11 @@ class _MyPageState extends State<MyPage> {
 
   void _openRegisterPage() {
     setState(() {
-      _selectedIndex = 3;
+      if (isLogged) {
+        _selectedIndex = 1;
+      } else {
+        _selectedIndex = 3;
+      }
     });
   }
 
@@ -118,6 +122,7 @@ class _MyPageState extends State<MyPage> {
                             userLogged: _userLogged!,
                             userController: userController,
                             onLogout: () {
+                              userController.logout();
                               _onUserLogged();
                               _onItemTapped(0);
                             },
@@ -167,7 +172,7 @@ class _MyPageState extends State<MyPage> {
             label: 'Sobre',
           ),
         ],
-        currentIndex: _selectedIndex < 3 ? _selectedIndex : 1,
+        currentIndex: _selectedIndex < 3 ? _selectedIndex : 0,
         onTap: (index) {
           if (index < 3) {
             _onItemTapped(index);

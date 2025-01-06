@@ -42,6 +42,18 @@ class _RegisterState extends State<Register> {
   List<String> errors = [];
   String? registerError;
 
+  void registerErrorF(String? message) {
+    setState(() {
+      if (message != null) {
+        registerError = message;
+        if (!errors.contains("form")) errors.add("form");
+      } else if (errors.contains("form")) {
+        registerError = null;
+        errors.remove("form");
+      }
+    });
+  }
+
   void loading(bool value) {
     setState(() {
       _isLoading = value;
@@ -554,11 +566,13 @@ class _RegisterState extends State<Register> {
                                   ),
                                   onPressed: () async {
                                     try {
+                                      registerErrorF(null);
                                       validatePreferenceCategory();
                                       validateName(null);
                                       validateEmail(null);
                                       validateWhatsapp(null);
                                       validatePassword(null);
+
                                       if (errors.isEmpty) {
                                         loading(true);
 
@@ -574,7 +588,10 @@ class _RegisterState extends State<Register> {
                                             ? null
                                             : "${ddd}9${whatsappController.text}";
 
-                                        await widget.userController
+                                        String message;
+                                        int code;
+                                        (message, code) = await widget
+                                            .userController
                                             .registerUser(User(
                                           name: formatName().trim(),
                                           email: emailC,
@@ -586,24 +603,30 @@ class _RegisterState extends State<Register> {
                                               preferenceNotification,
                                         ));
 
-                                        widget.onSave(
-                                            widget.userController.userLogged!);
+                                        if (code == 201) {
+                                          widget.onSave(widget
+                                              .userController.userLogged!);
+                                        }
+
+                                        if (code == 409) {
+                                          registerErrorF(message);
+                                        }
+
+                                        if (code == 500) {
+                                          registerErrorF(message);
+                                        }
                                       } else {
                                         logger.e(
                                             "RegisterPage: Formulário inválido => $errors");
 
-                                        setState(() {
-                                          registerError =
-                                              "Preencha todos os campos corretamente";
-                                          errors.add("form");
-                                        });
+                                        registerErrorF(
+                                            "Preencha todos os campos corretamente");
                                       }
                                     } catch (e) {
                                       logger.e(
                                           "RegisterPage: Erro no cadastro => $e");
-                                      setState(() {
-                                        errors.add("form");
-                                      });
+                                      registerErrorF(
+                                          "Erro cadastrando dados, por favor entre em contato com a equipe");
                                     }
                                     loading(false);
                                   },

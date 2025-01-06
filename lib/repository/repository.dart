@@ -17,17 +17,35 @@ class UserRepository {
     }
   }
 
-  Future registerUser(User user) async {
+  Future<void> _close() async {
+    try {
+      await Database.close();
+      logger.i("UserRepository-close: Conexão com banco de dados fechada",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e(
+          "UserRepository-close: Erro fechando conexão com banco de dados => $e",
+          time: DateTime.now());
+    }
+  }
+
+  Future<bool> registerUser(User user) async {
     try {
       await _init();
+
       await Database.insertUser(user);
       logger.i("UserRepository-registerUser: Usuário cadastrado",
           time: DateTime.now());
+
+      await _close();
+      return true;
     } catch (e) {
       logger.e(
         "UserRepository-registerUser: Erro registrando usuário => $e",
         time: DateTime.now(),
       );
+
+      await _close();
       throw "UserRepository-registerUser: Erro registrando usuário => $e";
     }
   }
@@ -38,44 +56,87 @@ class UserRepository {
       await Database.updateUser(user);
       logger.i("UserRepository-updateUser: Usuário atualizado",
           time: DateTime.now());
+
+      await _close();
     } catch (e) {
       logger.e(
         "UserRepository-updateUser: Erro atualizando usuário => $e",
         time: DateTime.now(),
       );
+
+      await _close();
       throw "UserRepository-updateUser: Erro atualizando usuário => $e";
     }
   }
 
-  Future<User?> findUserByEmail(String email) async {
+  Future<(bool, bool)> checkIfUserExists(
+      String? email, String? whatsapp) async {
     try {
       await _init();
-      var user = await Database.findUserByEmail(email);
+      (bool, bool) userExists =
+          await Database.checkIfUserExists(email, whatsapp);
+
+      logger.i(
+          "UserRepository-checkIfUserExists: Usuário existe => $userExists",
+          time: DateTime.now());
+
+      await _close();
+      return userExists;
+    } catch (e) {
+      logger.e(
+        "UserRepository-checkIfUserExists: Erro buscando usuário => $e",
+        time: DateTime.now(),
+      );
+
+      await _close();
+      throw "UserRepository-checkIfUserExists: Erro buscando usuário => $e";
+    }
+  }
+
+  Future<(bool, bool)> checkIfUserExistsForUpdate(
+      String? email, String? whatsapp, String id) async {
+    try {
+      await _init();
+      (bool, bool) userExists =
+          await Database.checkIfUserExistsForUpdate(email, whatsapp, id);
+
+      logger.i(
+          "UserRepository-checkIfUserExistsForUpdate: Usuário existe => $userExists",
+          time: DateTime.now());
+
+      await _close();
+      return userExists;
+    } catch (e) {
+      logger.e(
+        "UserRepository-checkIfUserExistsForUpdate: Erro buscando usuário => $e",
+        time: DateTime.now(),
+      );
+
+      await _close();
+      throw "UserRepository-checkIfUserExistsForUpdate: Erro buscando usuário => $e";
+    }
+  }
+
+  Future<User?> findUser(String? email, String? whatsapp) async {
+    try {
+      await _init();
+      User? user = email != null
+          ? await Database.findUser(email, null)
+          : await Database.findUser(null, whatsapp);
+
       logger.i("UserRepository-findUserByEmail: Usuário encontrado",
           time: DateTime.now());
+
+      await _close();
       return user;
     } catch (e) {
       logger.e(
         "UserRepository-findUserByEmail: Erro buscando usuário => $e",
         time: DateTime.now(),
       );
-      throw "UserRepository-findUserByEmail: Erro buscando usuário => $e";
-    }
-  }
 
-  Future<User?> findUserByWhatsapp(String whatsapp) async {
-    try {
-      await _init();
-      var user = await Database.findUserByWhatsapp(whatsapp);
-      logger.i("UserRepository-findUserByWhatsapp: Usuário encontrado",
-          time: DateTime.now());
-      return user;
-    } catch (e) {
-      logger.e(
-        "UserRepository-findUserByWhatsapp: Erro buscando usuário => $e",
-        time: DateTime.now(),
-      );
-      throw "UserRepository-findUserByWhatsapp: Erro buscando usuário => $e";
+      await _close();
+      throw "UserRepository-findUserByEmail: Erro buscando usuário => $e";
     }
   }
 }

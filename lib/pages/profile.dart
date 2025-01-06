@@ -31,6 +31,7 @@ class _ProfileState extends State<Profile> {
   List<DropdownMenuEntry> ddds = [];
 
   late UserLogged userLogged;
+  String? successMessage;
 
   String ddd = "84";
   String preferenceNotification = "email";
@@ -42,6 +43,18 @@ class _ProfileState extends State<Profile> {
 
   List<String> errors = [];
   String? registerError;
+
+  void registerErrorF(String? message) {
+    setState(() {
+      if (message != null) {
+        registerError = message;
+        if (!errors.contains("form")) errors.add("form");
+      } else if (errors.contains("form")) {
+        registerError = null;
+        errors.remove("form");
+      }
+    });
+  }
 
   void loading(bool value) {
     setState(() {
@@ -431,6 +444,7 @@ class _ProfileState extends State<Profile> {
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         spacing: 5,
                         children: [
                           Row(
@@ -533,111 +547,164 @@ class _ProfileState extends State<Profile> {
                             ),
                         ],
                       ),
-                      ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              widget.userController.logout();
-                              widget.onLogout();
-                            });
-                          },
-                          child: Text("fechar")),
                       Column(
                         spacing: 5,
                         children: [
-                          SizedBox(
-                            width: 150,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all<Color>(
-                                  Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                              onPressed: () async {
-                                try {
-                                  setState(() {
-                                    errors.remove("form");
-                                  });
-                                  validatePreferenceCategory();
-                                  validateName(null);
-                                  validateEmail(null);
-                                  validateWhatsapp(null);
-                                  validatePassword(null);
-
-                                  if (errors.isEmpty ||
-                                      (errors.contains("password") &&
-                                          passwordController.text.isEmpty)) {
-                                    loading(true);
-
-                                    logger.i("ProfilePage: Formulário válido");
-                                    String? emailC =
-                                        emailController.text.isEmpty
-                                            ? null
-                                            : emailController.text;
-
-                                    String? whatsappC = whatsappController
-                                            .text.isEmpty
-                                        ? null
-                                        : "${ddd}9${whatsappController.text}";
-
-                                    await widget.userController.updateUser(User(
-                                      id: userLogged.id,
-                                      name: formatName().trim(),
-                                      email: emailC,
-                                      whatsapp: whatsappC,
-                                      password: passwordController.text,
-                                      categories: userPreferenceCategory,
-                                      location: userLocation,
-                                      preferenceNotification:
-                                          preferenceNotification,
-                                    ));
-                                  } else {
-                                    logger.e(
-                                        "ProfilePage: Formulário inválido => $errors");
-
-                                    setState(() {
-                                      registerError =
-                                          "Preencha todos os campos corretamente";
-                                      if (!errors.contains("form")) {
-                                        errors.add("form");
-                                      }
-                                    });
-                                  }
-                                } catch (e) {
-                                  logger.e(
-                                      "ProfilePage: Erro na atualização => $e");
-                                  setState(() {
-                                    if (!errors.contains("form")) {
-                                      errors.add("form");
-                                    }
-                                  });
-                                }
-                                loading(false);
-                              },
-                              child: _isLoading
-                                  ? CircularProgressIndicator(
-                                      strokeWidth: 3,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary),
-                                    )
-                                  : Text(
-                                      'Atualizar',
-                                      style: TextStyle(
-                                        fontSize: 16,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 150,
+                                height: 50,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    side: WidgetStateProperty.all<BorderSide>(
+                                      BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onPrimary,
+                                            .primary,
+                                        width: 0.5,
                                       ),
                                     ),
-                            ),
+                                  ),
+                                  onPressed: widget.onLogout,
+                                  child: Text(
+                                    'Sair',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Column(
+                                spacing: 5,
+                                children: [
+                                  SizedBox(
+                                    width: 150,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            WidgetStateProperty.all<Color>(
+                                          Theme.of(context).colorScheme.primary,
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        try {
+                                          setState(() {
+                                            errors.remove("form");
+                                            successMessage = null;
+                                          });
+                                          validatePreferenceCategory();
+                                          validateName(null);
+                                          validateEmail(null);
+                                          validateWhatsapp(null);
+                                          validatePassword(null);
+
+                                          if (errors.isEmpty ||
+                                              (errors.contains("password") &&
+                                                  passwordController
+                                                      .text.isEmpty)) {
+                                            loading(true);
+
+                                            logger.i(
+                                                "ProfilePage: Formulário válido");
+                                            String? emailC =
+                                                emailController.text.isEmpty
+                                                    ? null
+                                                    : emailController.text;
+
+                                            String? whatsappC = whatsappController
+                                                    .text.isEmpty
+                                                ? null
+                                                : "${ddd}9${whatsappController.text}";
+
+                                            String message;
+                                            int code;
+
+                                            (message, code) = await widget
+                                                .userController
+                                                .updateUser(User(
+                                              id: userLogged.id,
+                                              name: formatName().trim(),
+                                              email: emailC,
+                                              whatsapp: whatsappC,
+                                              password: passwordController.text,
+                                              categories:
+                                                  userPreferenceCategory,
+                                              location: userLocation,
+                                              preferenceNotification:
+                                                  preferenceNotification,
+                                            ));
+
+                                            if (code == 204) {
+                                              setState(() {
+                                                successMessage =
+                                                    "Dados atualizados com sucesso!";
+                                              });
+                                            }
+
+                                            if (code == 409) {
+                                              registerErrorF(message);
+                                            }
+
+                                            if (code == 500) {
+                                              registerErrorF(message);
+                                            }
+                                          } else {
+                                            logger.e(
+                                                "ProfilePage: Formulário inválido => $errors");
+
+                                            registerErrorF(
+                                                "Preencha todos os campos corretamente");
+                                          }
+                                        } catch (e) {
+                                          logger.e(
+                                              "ProfilePage: Erro na atualização => $e");
+                                          registerErrorF(
+                                              "Erro atualizando dados, por favor entre em contato com a equipe");
+                                        }
+                                        loading(false);
+                                      },
+                                      child: _isLoading
+                                          ? CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Theme.of(context)
+                                                          .colorScheme
+                                                          .onPrimary),
+                                            )
+                                          : Text(
+                                              'Atualizar',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onPrimary,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
+                          if (successMessage != null)
+                            Text(
+                              successMessage!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 12,
+                              ),
+                            ),
                           if (errors.contains("form"))
                             Text(
                               registerError ??
                                   "Erro atualizando dados, por favor entre em contato com a equipe",
-                              textAlign: TextAlign.center,
+                              textAlign: TextAlign.end,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.error,
                                 fontSize: 12,
@@ -645,9 +712,6 @@ class _ProfileState extends State<Profile> {
                             ),
                         ],
                       ),
-                      SizedBox(
-                        height: 10,
-                      )
                     ],
                   )),
             ],

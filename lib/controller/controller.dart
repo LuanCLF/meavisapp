@@ -22,8 +22,18 @@ class UserController extends ChangeNotifier {
 
   UserController();
 
-  Future<void> registerUser(User user) async {
+  Future<(String, int)> registerUser(User user) async {
     try {
+      (bool, bool) userExists =
+          await _userRepository.checkIfUserExists(user.email, user.whatsapp);
+      if (userExists.$1 && userExists.$2) {
+        return ("Email e Whatsapp já cadastrados", 409);
+      } else if (userExists.$1) {
+        return ("Email já cadastrado", 409);
+      } else if (userExists.$2) {
+        return ("Whatsapp já cadastrado", 409);
+      }
+
       await _userRepository.registerUser(user);
       userLogged = UserLogged(
         id: "",
@@ -39,16 +49,27 @@ class UserController extends ChangeNotifier {
 
       _logger.i("UserController-registerUser: Usuário cadastrado",
           time: DateTime.now());
+      return ("Usuário cadastrado", 201);
     } catch (e) {
       _logger.e(
         "UserController-registerUser: Erro registrando usuário => $e",
         time: DateTime.now(),
       );
+      return ("Erro registrando usuário", 500);
     }
   }
 
-  Future<void> updateUser(User user) async {
+  Future<(String, int)> updateUser(User user) async {
     try {
+      (bool, bool) userExists = await _userRepository
+          .checkIfUserExistsForUpdate(user.email, user.whatsapp, user.id!);
+      if (userExists.$1 && userExists.$2) {
+        return ("Email e Whatsapp já cadastrados", 409);
+      } else if (userExists.$1) {
+        return ("Email já cadastrado", 409);
+      } else if (userExists.$2) {
+        return ("Whatsapp já cadastrado", 409);
+      }
       await _userRepository.updateUser(user);
       await _saveInPreferences(user);
       userLogged = UserLogged(
@@ -60,16 +81,17 @@ class UserController extends ChangeNotifier {
         whatsapp: user.whatsapp,
         location: user.location,
       );
-
       notifyListeners();
-
       _logger.i("UserController-updateUser: Usuário atualizado",
           time: DateTime.now());
+
+      return ("Usuário atualizado", 204);
     } catch (e) {
       _logger.e(
         "UserController-updateUser: Erro atualizando usuário => $e",
         time: DateTime.now(),
       );
+      return ("Erro atualizando usuário", 500);
     }
   }
 
@@ -77,8 +99,8 @@ class UserController extends ChangeNotifier {
       String loginId, String loginMethod, String password) async {
     try {
       User? user = loginMethod == "email"
-          ? await _userRepository.findUserByEmail(loginId)
-          : await _userRepository.findUserByWhatsapp(loginId);
+          ? await _userRepository.findUser(loginId, null)
+          : await _userRepository.findUser(null, loginId);
 
       if (user == null) {
         return ("Usuário não encontrado", 404);
