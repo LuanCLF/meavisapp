@@ -7,6 +7,7 @@ class Database {
   static final _logger = Logger();
   static Db? _db;
   static DbCollection? userCollection;
+  static DbCollection? notificationCollection;
 
   static Future<void> connect() async {
     try {
@@ -18,6 +19,27 @@ class Database {
       Database._logger.i("Database-connect: Status do servidor => $status");
     } catch (e) {
       Database._logger.e('Database-connect: Erro conectando ao MongoDB => $e');
+    }
+  }
+
+  static Future<void> insertNotification(Notification notification) async {
+    try {
+      notificationCollection = _db!.collection("notifications");
+
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      if (notificationCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+
+      WriteResult result =
+          await notificationCollection!.insertOne(notification.toJson());
+      Database._logger.i("Database: Notificação cadastrada => $result");
+    } catch (e) {
+      Database._logger.e("Database: Erro cadastrando notificação => $e");
+      throw 'Database: Erro cadastrando notificação => $e';
     }
   }
 
@@ -183,6 +205,45 @@ class Database {
     } catch (e) {
       Database._logger
           .e("Database-close: Erro fechando conexão com banco de dados => $e");
+    }
+  }
+
+  static Future<List<UserNotification>> findUsers(
+      List<String> categories, String? location) async {
+    try {
+      userCollection = _db!.collection("users");
+
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      if (userCollection == null) {
+        throw 'Conexão com userCollection falhou';
+      }
+
+      // Construindo a consulta
+      var query = {
+        'categories': {'\$in': categories}
+      };
+      if (location != null) {
+        query['location'] = {
+          '\$eq': [location]
+        };
+      }
+
+      List<UserNotification> usersNotifications = await userCollection!
+          .find(
+            query,
+          )
+          .toList()
+          .then((value) =>
+              value.map((e) => UserNotification.fromJson(e)).toList());
+
+      Database._logger.i("Database: Usuários encontrados");
+      return usersNotifications;
+    } catch (e) {
+      Database._logger.e("Database: Erro buscando usuários => $e");
+      throw 'Database: Erro buscando usuários => $e';
     }
   }
 }

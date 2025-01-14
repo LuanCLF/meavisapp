@@ -1,3 +1,22 @@
+abstract class INotification {
+  String get title;
+  String get text;
+  String get date;
+  String get time;
+  String? get location;
+  List<String> get categories;
+  List<String> get users;
+
+  Map<String, dynamic> toJson();
+}
+
+abstract class IUserNotification {
+  String get name;
+  String get preferenceNotification;
+  String? get email;
+  String? get whatsapp;
+}
+
 abstract class IUser {
   String? get id;
   String get name;
@@ -7,6 +26,7 @@ abstract class IUser {
   String? get location;
   String? get email;
   String? get whatsapp;
+  bool? get isAdmin;
 
   Map<String, dynamic> toJson();
 }
@@ -19,6 +39,7 @@ abstract class IUserLogged {
   String? get location;
   List<String> get categories;
   String get preferenceNotification;
+  bool get isAdmin;
 }
 
 abstract class ILocation {

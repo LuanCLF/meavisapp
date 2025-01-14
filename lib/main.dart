@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 import 'package:meavisapp/controller/controller.dart';
 import 'package:meavisapp/domain/entities.dart';
 import 'package:meavisapp/pages/about.dart';
+import 'package:meavisapp/pages/admin.dart';
 import 'package:meavisapp/pages/home.dart';
 import 'package:meavisapp/pages/profile.dart';
 import 'package:meavisapp/pages/register.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AdminController()),
         ChangeNotifierProvider(create: (_) => UserController()),
       ],
       child: MyApp(),
@@ -47,7 +49,8 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  UserController userController = UserController();
+  late AdminController adminController;
+  late UserController userController;
   int _selectedIndex = 0;
   bool _isLoading = true;
   UserLogged? _userLogged;
@@ -56,6 +59,8 @@ class _MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
+    adminController = Provider.of<AdminController>(context, listen: false);
+    userController = Provider.of<UserController>(context, listen: false);
     _simulateLoading();
     _onUserLogged();
   }
@@ -91,6 +96,40 @@ class _MyPageState extends State<MyPage> {
     });
   }
 
+  Widget _profile() {
+    if (isLogged && _userLogged?.isAdmin == false) {
+      return Profile(
+        userLogged: _userLogged!,
+        userController: userController,
+        onLogout: () {
+          userController.logout();
+          _onUserLogged();
+          _onItemTapped(0);
+        },
+      );
+    } else if (isLogged && _userLogged?.isAdmin == true) {
+      return Admin(
+        adminController: adminController,
+        onLogout: () {
+          userController.logout();
+          _onUserLogged();
+          _onItemTapped(0);
+        },
+        userController: userController,
+      );
+    } else {
+      return Login(
+        userController: userController,
+        onRegister: _openRegisterPage,
+        userLogged: _userLogged,
+        onLogin: () {
+          _onUserLogged();
+          _onItemTapped(1);
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,25 +156,7 @@ class _MyPageState extends State<MyPage> {
                       onRegister: _openRegisterPage,
                     )
                   else if (_selectedIndex == 1)
-                    isLogged
-                        ? Profile(
-                            userLogged: _userLogged!,
-                            userController: userController,
-                            onLogout: () {
-                              userController.logout();
-                              _onUserLogged();
-                              _onItemTapped(0);
-                            },
-                          )
-                        : Login(
-                            userController: userController,
-                            onRegister: _openRegisterPage,
-                            userLogged: _userLogged,
-                            onLogin: () {
-                              _onUserLogged();
-                              _onItemTapped(1);
-                            },
-                          )
+                    _profile()
                   else if (_selectedIndex == 2)
                     About()
                   else if (_selectedIndex == 3)

@@ -5,6 +5,51 @@ import 'package:meavisapp/repository/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class AdminController extends ChangeNotifier {
+  int totalUsers = 0;
+  final AdminRepository _adminRepository = AdminRepository();
+  final _logger = Logger();
+
+  Future<(String, int)> sendNotification(List<String> categories,
+      String? location, String subject, String body) async {
+    try {
+      List<UserNotification> users = await _findUsers(categories, location);
+      await _adminRepository.sendNotification(
+          users, subject, body, categories, location);
+
+      _logger.i(
+          "AdminController-sendNotification: Notificação enviada => Quantidade de usuários cadastrados para essa notificação: ${users.length}",
+          time: DateTime.now());
+
+      return ("Notificação enviada", 204);
+    } catch (e) {
+      _logger.e(
+        "AdminController-sendNotification: Erro enviando notificação => $e",
+        time: DateTime.now(),
+      );
+      return ("Erro enviando notificação", 500);
+    }
+  }
+
+  Future<List<UserNotification>> _findUsers(
+      List<String> categories, String? location) async {
+    try {
+      List<UserNotification> users =
+          await _adminRepository.findUsers(categories, location);
+      _logger.i("AdminController-findUsers: Usuários encontrados",
+          time: DateTime.now());
+
+      return users;
+    } catch (e) {
+      _logger.e(
+        "AdminController-findUsers: Erro encontrando usuários => $e",
+        time: DateTime.now(),
+      );
+    }
+    return [];
+  }
+}
+
 class UserController extends ChangeNotifier {
   final _logger = Logger();
 
@@ -43,6 +88,7 @@ class UserController extends ChangeNotifier {
         email: user.email,
         whatsapp: user.whatsapp,
         location: user.location,
+        isAdmin: false,
       );
 
       notifyListeners();
@@ -73,14 +119,14 @@ class UserController extends ChangeNotifier {
       await _userRepository.updateUser(user);
       await _saveInPreferences(user);
       userLogged = UserLogged(
-        id: user.id!,
-        name: user.name,
-        categories: user.categories,
-        preferenceNotification: user.preferenceNotification,
-        email: user.email,
-        whatsapp: user.whatsapp,
-        location: user.location,
-      );
+          id: user.id!,
+          name: user.name,
+          categories: user.categories,
+          preferenceNotification: user.preferenceNotification,
+          email: user.email,
+          whatsapp: user.whatsapp,
+          location: user.location,
+          isAdmin: user.isAdmin == true);
       notifyListeners();
       _logger.i("UserController-updateUser: Usuário atualizado",
           time: DateTime.now());
@@ -135,19 +181,19 @@ class UserController extends ChangeNotifier {
 
       if (prefs.getString("id") != null) {
         userLogged = UserLogged(
-          id: prefs.getString("id")!,
-          name: prefs.getString("name")!,
-          categories: prefs
-              .getString("categories")!
-              .replaceAll("[", "")
-              .replaceAll("]", "")
-              .replaceAll(" ", "")
-              .split(","),
-          preferenceNotification: prefs.getString("preferenceNotification")!,
-          email: prefs.getString("email"),
-          whatsapp: prefs.getString("whatsapp"),
-          location: prefs.getString("location"),
-        );
+            id: prefs.getString("id")!,
+            name: prefs.getString("name")!,
+            categories: prefs
+                .getString("categories")!
+                .replaceAll("[", "")
+                .replaceAll("]", "")
+                .replaceAll(" ", "")
+                .split(","),
+            preferenceNotification: prefs.getString("preferenceNotification")!,
+            email: prefs.getString("email"),
+            whatsapp: prefs.getString("whatsapp"),
+            location: prefs.getString("location"),
+            isAdmin: prefs.getBool("isAdmin") == true);
         isLogged = true;
         _logger.i("UserController-getLoggedUser: Usuário logado");
       } else {
@@ -174,6 +220,7 @@ class UserController extends ChangeNotifier {
     prefs.remove("email");
     prefs.remove("whatsapp");
     prefs.remove("location");
+    prefs.remove("isAdmin");
 
     isLogged = false;
     userLogged = null;
@@ -186,6 +233,9 @@ class UserController extends ChangeNotifier {
     prefs.setString("name", user.name);
     prefs.setString("categories", user.categories.toString());
     prefs.setString("preferenceNotification", user.preferenceNotification);
+
+    prefs.setBool("isAdmin", user.isAdmin!);
+
     if (user.email != null) {
       prefs.setString("email", user.email!);
     }

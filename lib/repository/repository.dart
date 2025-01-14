@@ -1,7 +1,142 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:meavisapp/domain/entities.dart';
 import 'package:meavisapp/domain/interfaces.dart';
 import 'package:meavisapp/infra/database.dart';
+
+class AdminRepository {
+  final logger = Logger();
+
+  Future<void> _init() async {
+    try {
+      await Database.connect();
+      logger.i("AdminRepository-init: Conexão com banco de dados aberta",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e("AdminRepository-init: Erro conectando com banco de dados => $e",
+          time: DateTime.now());
+    }
+  }
+
+  Future<void> _close() async {
+    try {
+      await Database.close();
+      logger.i("AdminRepository-close: Conexão com banco de dados fechada",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e(
+          "AdminRepository-close: Erro fechando conexão com banco de dados => $e",
+          time: DateTime.now());
+    }
+  }
+
+  Future<void> _registerNotification(Notification notification) async {
+    try {
+      await _init();
+
+      await Database.insertNotification(notification);
+      logger.i("AdminRepository-registerNotification: Notificação cadastrada",
+          time: DateTime.now());
+
+      await _close();
+    } catch (e) {
+      logger.e(
+        "AdminRepository-registerNotification: Erro registrando notificação => $e",
+        time: DateTime.now(),
+      );
+
+      await _close();
+      throw "AdminRepository-registerNotification: Erro registrando notificação => $e";
+    }
+  }
+
+  Future<List<UserNotification>> findUsers(
+      List<String> categories, String? location) async {
+    try {
+      await _init();
+      List<UserNotification> users =
+          await Database.findUsers(categories, location);
+      logger.i("AdminRepository-findUsers: Usuários encontrados",
+          time: DateTime.now());
+
+      await _close();
+      return users;
+    } catch (e) {
+      logger.e(
+        "AdminRepository-findUsers: Erro encontrando usuários => $e",
+        time: DateTime.now(),
+      );
+
+      await _close();
+      throw "AdminRepository-findUsers: Erro encontrando usuários => $e";
+    }
+  }
+
+  Future<void> sendNotification(List<UserNotification> users, String subject,
+      String body, List<String> categories, String? location) async {
+    try {
+      if (users.isNotEmpty) {
+        List<String> emails = users.map((e) => e.email!).toList();
+
+        await _sendEmail(emails, subject, body);
+      }
+
+      await _registerNotification(Notification(
+        title: subject,
+        text: body,
+        date: DateTime.now().toString().substring(0, 10),
+        time: DateTime.now().toString().substring(11, 16),
+        location: location,
+        categories: categories,
+        users: users.isNotEmpty ? users.map((e) => e.name).toList() : [],
+      ));
+
+      logger.i("AdminRepository-sendNotification: Notificação enviada",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e(
+        "AdminRepository-sendNotification: Erro enviando notificação => $e",
+        time: DateTime.now(),
+      );
+
+      throw "AdminRepository-sendNotification: Erro enviando notificação => $e";
+    }
+  }
+
+  Future<void> _sendEmail(
+      List<String> emails, String subject, String body) async {
+    String email = dotenv.env['EMAIL']!;
+    String name = dotenv.env['NAME']!;
+
+    String smtphost = dotenv.env['SMTP_HOST']!;
+    String smtpport = dotenv.env['SMTP_PORT']!;
+    String smtpusername = dotenv.env['SMTP_USERNAME']!;
+    String smptkey = dotenv.env['SMTP_KEY']!;
+    String smtpcertificate = dotenv.env['SMTP_CERTIFICATE']!;
+
+    final smtpServer = SmtpServer(smtphost,
+        port: int.tryParse(smtpport)!,
+        username: smtpusername,
+        password: smptkey,
+        ignoreBadCertificate: smtpcertificate == "true");
+    final message = Message()
+      ..from = Address(email, name)
+      ..subject = subject
+      ..recipients = emails
+      ..text = body;
+
+    try {
+      final sendReport = await send(message, smtpServer);
+      logger.i(
+          'AdminRepository-_sendEmail: Relatório do envio de mensagens: $sendReport');
+    } on MailerException catch (e) {
+      logger.i('AdminRepository-_sendEmail: Erro enviando email => $e');
+      throw 'AdminRepository-_sendEmail: Erro enviando email => $e';
+    }
+  }
+}
 
 class UserRepository {
   final logger = Logger();
@@ -159,16 +294,16 @@ class CategorieRepository {
 class LocationRepository {
   Future<List<ILocation>> getLocations() async {
     List<ILocation> locations = [
-      Location(id: 1, location: "Sítio Canto"),
-      Location(id: 2, location: "Cohab"),
-      Location(id: 3, location: "Jacu"),
-      Location(id: 4, location: "Centro"),
-      Location(id: 5, location: "Umarizeira"),
-      Location(id: 6, location: "Canto Bonito"),
-      Location(id: 7, location: "Sítio Frade"),
-      Location(id: 8, location: "Lagoa Nova"),
-      Location(id: 9, location: "Planalto"),
-      Location(id: 10, location: "Jocellyn Villar"),
+      UserLocation(id: 1, location: "Sítio Canto"),
+      UserLocation(id: 2, location: "Cohab"),
+      UserLocation(id: 3, location: "Jacu"),
+      UserLocation(id: 4, location: "Centro"),
+      UserLocation(id: 5, location: "Umarizeira"),
+      UserLocation(id: 6, location: "Canto Bonito"),
+      UserLocation(id: 7, location: "Sítio Frade"),
+      UserLocation(id: 8, location: "Lagoa Nova"),
+      UserLocation(id: 9, location: "Planalto"),
+      UserLocation(id: 10, location: "Jocellyn Villar"),
     ];
     return locations;
   }

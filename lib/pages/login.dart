@@ -107,6 +107,10 @@ class _LoginState extends State<Login> {
   void initState() {
     setState(() {
       widget.userController.getDDDs();
+      ddds = widget.userController.ddds
+          .map((ddd) =>
+              DropdownMenuEntry(value: ddd.id, label: ddd.ddd.toString()))
+          .toList();
 
       preferenceNotification =
           widget.userLogged?.preferenceNotification ?? "email";
@@ -131,17 +135,6 @@ class _LoginState extends State<Login> {
     whatsappController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    setState(() {
-      ddds = widget.userController.ddds
-          .map((ddd) =>
-              DropdownMenuEntry(value: ddd.id, label: ddd.ddd.toString()))
-          .toList();
-    });
-    super.didChangeDependencies();
   }
 
   @override
