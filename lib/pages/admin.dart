@@ -135,7 +135,7 @@ class _AdminState extends State<Admin> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: ListView(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(20),
       children: [
         Center(
             child: SizedBox(
@@ -158,10 +158,10 @@ class _AdminState extends State<Admin> {
               Text("Cadastre uma nova informação para os usuários",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                   )),
               Row(
-                spacing: 40,
+                spacing: 20,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
@@ -205,7 +205,7 @@ class _AdminState extends State<Admin> {
                             : Text(notificationLocation!),
                         dropdownMenuEntries: locations,
                         initialSelection: notificationLocation,
-                        width: 195,
+                        width: 190,
                         onSelected: (value) {
                           setState(() {
                             notificationLocation = locations[value - 1].label;

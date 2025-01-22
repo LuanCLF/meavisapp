@@ -17,7 +17,7 @@ class Home extends StatelessWidget {
               spacing: 40,
               children: <Widget>[
                 SizedBox(
-                  height: 100,
+                  height: 20,
                 ),
                 Text(
                   'MEAVISA',
@@ -78,6 +78,9 @@ class Home extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                         )),
+                    SizedBox(
+                      height: 20,
+                    ),
                   ]),
                 ),
               ],

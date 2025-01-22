@@ -76,7 +76,7 @@ class _NotificationHistoryState extends State<NotificationHistory> {
       isLoading = true;
     });
 
-    updateNotifications(false, allNotifications, 0);
+    updateNotifications(false, allNotifications, page);
   }
 
   @override
@@ -247,24 +247,30 @@ class CardNotification extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                   Text('$date - $time'),
                 ],
               ),
               SizedBox(height: 10),
-              Text(text),
+              Text(
+                text,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 5,
+              ),
               SizedBox(height: 10),
               if (location != null) Text('Local: $location'),
               SizedBox(height: 10),
               Text('Categorias: ${categories.join(', ')}'),
-              SizedBox(height: 10),
-              Text('Usuários Cadastrados: ${users.length}'),
             ],
           ),
         ));

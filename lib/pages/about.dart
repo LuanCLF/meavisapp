@@ -50,7 +50,7 @@ class _AboutState extends State<About> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: ListView(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(20),
       children: [
         Center(
           child: SizedBox(
@@ -58,24 +58,15 @@ class _AboutState extends State<About> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 100,
+                  height: 50,
                 ),
                 Text(
-                  'Sobre o',
+                  'Sobre',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w900,
                     fontSize: 56,
-                  ),
-                ),
-                Text(
-                  'MEAVISA',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 64,
                   ),
                 ),
                 SizedBox(

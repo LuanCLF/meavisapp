@@ -145,340 +145,351 @@ class _LoginState extends State<Login> {
       children: [
         Center(
           child: SizedBox(
-            width: 400,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 20,
-              children: [
-                SizedBox(
-                  height: 150,
-                ),
-                Text(
-                  "Acesse seus dados",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 56,
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+              width: 400,
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   spacing: 20,
                   children: [
+                    SizedBox(
+                      height: 100,
+                    ),
+                    Text(
+                      "Acesse seus dados",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 56,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      spacing: 20,
                       children: [
-                        Text(
-                          "Entrar com",
-                        ),
-                        DropdownMenu(
-                          dropdownMenuEntries: [
-                            DropdownMenuEntry(value: 1, label: "Email"),
-                            DropdownMenuEntry(value: 2, label: "Whatsapp"),
-                          ],
-                          initialSelection: defaultLogin == "email" ? 1 : 2,
-                          onSelected: (value) {
-                            setState(() {
-                              if (value == 1) {
-                                defaultLogin = "email";
-                              } else {
-                                defaultLogin = "whatsapp";
-                              }
-                            });
-                          },
-                          inputDecorationTheme: InputDecorationTheme(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          menuStyle: MenuStyle(
-                            backgroundColor: WidgetStateProperty.all<Color>(
-                                Theme.of(context).colorScheme.surface),
-                            padding:
-                                WidgetStateProperty.all<EdgeInsetsGeometry>(
-                                    EdgeInsets.only(
-                                        left: 10,
-                                        right: 10,
-                                        top: 5,
-                                        bottom: 5)),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (defaultLogin == "email")
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 5,
-                        children: [
-                          TextFormField(
-                            controller: emailController,
-                            maxLength: 100,
-                            buildCounter: (BuildContext context,
-                                {required int currentLength,
-                                required int? maxLength,
-                                required bool isFocused}) {
-                              if (isFocused && emailError == null) {
-                                return Text("$currentLength/$maxLength");
-                              } else {
-                                return null;
-                              }
-                            },
-                            decoration: InputDecoration(
-                              labelText: "Email",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            onChanged: (value) {
-                              setState(() {
-                                emailController.value = TextEditingValue(
-                                  text: value.replaceAll(" ", ""),
-                                );
-                              });
-                            },
-                          ),
-                          if (emailError != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              emailError!,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
-                                fontSize: 12,
+                              "Entrar com",
+                            ),
+                            DropdownMenu(
+                              dropdownMenuEntries: [
+                                DropdownMenuEntry(value: 1, label: "Email"),
+                                DropdownMenuEntry(value: 2, label: "Whatsapp"),
+                              ],
+                              initialSelection: defaultLogin == "email" ? 1 : 2,
+                              onSelected: (value) {
+                                setState(() {
+                                  if (value == 1) {
+                                    defaultLogin = "email";
+                                  } else {
+                                    defaultLogin = "whatsapp";
+                                  }
+                                });
+                              },
+                              inputDecorationTheme: InputDecorationTheme(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                              ),
+                              menuStyle: MenuStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(
+                                    Theme.of(context).colorScheme.surface),
+                                padding:
+                                    WidgetStateProperty.all<EdgeInsetsGeometry>(
+                                        EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 5,
+                                            bottom: 5)),
                               ),
                             ),
-                        ],
-                      ),
-                    if (defaultLogin == "whatsapp")
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 5,
-                        children: [
-                          Row(
-                            spacing: 10,
+                          ],
+                        ),
+                        if (defaultLogin == "email")
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 5,
                             children: [
-                              DropdownMenu(
-                                label: Text(ddd),
-                                dropdownMenuEntries: ddds,
-                                initialSelection: ddd,
-                                width: 100,
-                                onSelected: (value) {
-                                  setState(() {
-                                    ddd = ddds[value - 1].label;
-                                  });
+                              TextFormField(
+                                controller: emailController,
+                                maxLength: 100,
+                                buildCounter: (BuildContext context,
+                                    {required int currentLength,
+                                    required int? maxLength,
+                                    required bool isFocused}) {
+                                  if (isFocused && emailError == null) {
+                                    return Text("$currentLength/$maxLength");
+                                  } else {
+                                    return null;
+                                  }
                                 },
-                                inputDecorationTheme: InputDecorationTheme(
+                                decoration: InputDecoration(
+                                  labelText: "Email",
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                 ),
-                                menuStyle: MenuStyle(
-                                  backgroundColor: WidgetStateProperty.all<
-                                          Color>(
-                                      Theme.of(context).colorScheme.surface),
-                                  padding: WidgetStateProperty
-                                      .all<EdgeInsetsGeometry>(EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                          top: 5,
-                                          bottom: 5)),
-                                ),
-                              ),
-                              Expanded(
-                                child: TextFormField(
-                                  controller: whatsappController,
-                                  onChanged: (value) {
-                                    whatsappController.value = TextEditingValue(
-                                      text: validateWhatsapp(value),
+                                keyboardType: TextInputType.emailAddress,
+                                onChanged: (value) {
+                                  setState(() {
+                                    emailController.value = TextEditingValue(
+                                      text: value.replaceAll(" ", ""),
                                     );
-                                  },
-                                  decoration: InputDecoration(
-                                    labelText: "Whatsapp",
-                                    prefixText: "+55 $ddd 9 ",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                ),
+                                  });
+                                },
                               ),
+                              if (emailError != null)
+                                Text(
+                                  emailError!,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                    fontSize: 12,
+                                  ),
+                                ),
                             ],
                           ),
-                          if (whatsappError != null)
-                            Text(
-                              whatsappError!,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
-                                fontSize: 12,
+                        if (defaultLogin == "whatsapp")
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 5,
+                            children: [
+                              Row(
+                                spacing: 10,
+                                children: [
+                                  DropdownMenu(
+                                    label: Text(ddd),
+                                    dropdownMenuEntries: ddds,
+                                    initialSelection: ddd,
+                                    width: 100,
+                                    onSelected: (value) {
+                                      setState(() {
+                                        ddd = ddds[value - 1].label;
+                                      });
+                                    },
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                    ),
+                                    menuStyle: MenuStyle(
+                                      backgroundColor:
+                                          WidgetStateProperty.all<Color>(
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .surface),
+                                      padding: WidgetStateProperty.all<
+                                              EdgeInsetsGeometry>(
+                                          EdgeInsets.only(
+                                              left: 10,
+                                              right: 10,
+                                              top: 5,
+                                              bottom: 5)),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: whatsappController,
+                                      onChanged: (value) {
+                                        whatsappController.value =
+                                            TextEditingValue(
+                                          text: validateWhatsapp(value),
+                                        );
+                                      },
+                                      decoration: InputDecoration(
+                                        labelText: "Whatsapp",
+                                        prefixText: "+55 $ddd 9 ",
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                        ],
-                      ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 5,
-                  children: [
-                    TextFormField(
-                      obscureText: true,
-                      controller: passwordController,
-                      maxLength: 100,
-                      buildCounter: (BuildContext context,
-                          {required int currentLength,
-                          required int? maxLength,
-                          required bool isFocused}) {
-                        if (isFocused && passwordError == null) {
-                          return Text("$currentLength/$maxLength");
-                        } else {
-                          return null;
-                        }
-                      },
-                      decoration: InputDecoration(
-                        labelText: "Senha",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
+                              if (whatsappError != null)
+                                Text(
+                                  whatsappError!,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                            ],
+                          ),
+                      ],
                     ),
-                    if (passwordError != null)
-                      Text(
-                        passwordError!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontSize: 12,
-                        ),
-                      ),
-                  ],
-                ),
-                Column(
-                  spacing: 5,
-                  children: [
-                    SizedBox(
-                      width: 150,
-                      height: 50,
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(
-                            Theme.of(context).colorScheme.primary,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 5,
+                      children: [
+                        TextFormField(
+                          obscureText: true,
+                          controller: passwordController,
+                          maxLength: 100,
+                          buildCounter: (BuildContext context,
+                              {required int currentLength,
+                              required int? maxLength,
+                              required bool isFocused}) {
+                            if (isFocused && passwordError == null) {
+                              return Text("$currentLength/$maxLength");
+                            } else {
+                              return null;
+                            }
+                          },
+                          decoration: InputDecoration(
+                            labelText: "Senha",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
                           ),
                         ),
-                        onPressed: () async {
-                          loading(true);
-                          try {
-                            validateEmail(null);
-                            validateWhatsapp(null);
-                            validatePassword(null);
+                        if (passwordError != null)
+                          Text(
+                            passwordError!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
+                    ),
+                    Column(
+                      spacing: 5,
+                      children: [
+                        SizedBox(
+                          width: 150,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            onPressed: () async {
+                              loading(true);
+                              try {
+                                validateEmail(null);
+                                validateWhatsapp(null);
+                                validatePassword(null);
 
-                            bool loginEmail =
-                                defaultLogin == "email" && emailError == null;
-                            bool loginWhatsapp = defaultLogin == "whatsapp" &&
-                                whatsappError == null;
+                                bool loginEmail = defaultLogin == "email" &&
+                                    emailError == null;
+                                bool loginWhatsapp =
+                                    defaultLogin == "whatsapp" &&
+                                        whatsappError == null;
 
-                            if ((loginEmail || loginWhatsapp) &&
-                                passwordError == null) {
-                              logger.i("LoginPage: Tentando logar");
+                                if ((loginEmail || loginWhatsapp) &&
+                                    passwordError == null) {
+                                  logger.i("LoginPage: Tentando logar");
 
-                              String message;
-                              int code;
-                              (message, code) =
-                                  await widget.userController.login(
-                                defaultLogin == "email"
-                                    ? emailController.text
-                                    : "${ddd}9${whatsappController.text}",
-                                defaultLogin,
-                                passwordController.text,
-                              );
+                                  String message;
+                                  int code;
+                                  (message, code) =
+                                      await widget.userController.login(
+                                    defaultLogin == "email"
+                                        ? emailController.text
+                                        : "${ddd}9${whatsappController.text}",
+                                    defaultLogin,
+                                    passwordController.text,
+                                  );
 
-                              logger.i("LoginPage: $message");
+                                  logger.i("LoginPage: $message");
 
-                              if (code == 200) {
-                                widget.onLogin();
-                              }
+                                  if (code == 200) {
+                                    widget.onLogin();
+                                  }
 
-                              if (code != 200) {
+                                  if (code != 200) {
+                                    setState(() {
+                                      loginError = message;
+                                    });
+                                  }
+
+                                  if (code == 500) throw message;
+                                } else {
+                                  logger.e("LoginPage: Formulário inválido");
+                                  loginError =
+                                      "Preencha todos os campos corretamente";
+                                }
+                              } catch (e) {
+                                logger.e("LoginPage: Erro no login => $e");
                                 setState(() {
-                                  loginError = message;
+                                  loginError =
+                                      "Erro acessando os dados, por favor entre em contato com a equipe";
                                 });
                               }
 
-                              if (code == 500) throw message;
-                            } else {
-                              logger.e("LoginPage: Formulário inválido");
-                              loginError =
-                                  "Preencha todos os campos corretamente";
-                            }
-                          } catch (e) {
-                            logger.e("LoginPage: Erro no login => $e");
-                            setState(() {
-                              loginError =
-                                  "Erro acessando os dados, por favor entre em contato com a equipe";
-                            });
-                          }
-
-                          loading(false);
-                        },
-                        child: _isLoading
-                            ? CircularProgressIndicator(
-                                strokeWidth: 3,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Theme.of(context).colorScheme.onPrimary),
-                              )
-                            : Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                ),
-                              ),
-                      ),
-                    ),
-                    if (loginError != null)
-                      Text(
-                        loginError!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontSize: 12,
+                              loading(false);
+                            },
+                            child: _isLoading
+                                ? CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary),
+                                  )
+                                : Text(
+                                    'Entrar',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
+                                    ),
+                                  ),
+                          ),
                         ),
-                      ),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                RichText(
-                  text: TextSpan(
-                    text: "Não tem uma conta? ",
-                    style: TextStyle(
-                      color: Colors.black,
+                        if (loginError != null)
+                          Text(
+                            loginError!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
                     ),
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: "Clique aqui",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = widget.onRegister,
-                      ),
-                      TextSpan(
-                        text: " para se cadastrar",
+                    SizedBox(
+                      height: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: "Não tem uma conta? ",
                         style: TextStyle(
                           color: Colors.black,
                         ),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: "Clique aqui",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = widget.onRegister,
+                          ),
+                          TextSpan(
+                            text: " para se cadastrar",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
+                    )
+                  ],
+                ),
+              )),
         )
       ],
     ));

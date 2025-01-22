@@ -189,14 +189,14 @@ class _RegisterState extends State<Register> {
           ),
         ),
         body: ListView(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(20),
           children: [
             Form(
                 child: SizedBox(
               child: Column(
                 children: [
                   SizedBox(
-                    height: 30,
+                    height: 20,
                   ),
                   Text(
                     'Saiba Tudo',
@@ -227,7 +227,7 @@ class _RegisterState extends State<Register> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Row(
-                            spacing: 40,
+                            spacing: 20,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Column(
@@ -274,7 +274,7 @@ class _RegisterState extends State<Register> {
                                         : Text(userLocation!),
                                     dropdownMenuEntries: locations,
                                     initialSelection: userLocation,
-                                    width: 195,
+                                    width: 190,
                                     onSelected: (value) {
                                       setState(() {
                                         userLocation =
