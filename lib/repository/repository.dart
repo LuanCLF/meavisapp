@@ -6,6 +6,61 @@ import 'package:meavisapp/domain/entities.dart';
 import 'package:meavisapp/domain/interfaces.dart';
 import 'package:meavisapp/infra/database.dart';
 
+class NotificationRepository {
+  final logger = Logger();
+
+  Future<void> _init() async {
+    try {
+      await Database.connect();
+      logger.i("AdminRepository-init: Conexão com banco de dados aberta",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e("AdminRepository-init: Erro conectando com banco de dados => $e",
+          time: DateTime.now());
+    }
+  }
+
+  Future<void> _close() async {
+    try {
+      await Database.close();
+      logger.i("AdminRepository-close: Conexão com banco de dados fechada",
+          time: DateTime.now());
+    } catch (e) {
+      logger.e(
+          "AdminRepository-close: Erro fechando conexão com banco de dados => $e",
+          time: DateTime.now());
+    }
+  }
+
+  Future<(List<Notification>, int)> getNotifications(
+      List<String> categories, String? location, bool all, int page) async {
+    try {
+      await _init();
+
+      List<Notification> notifications;
+      int pages;
+      (
+        notifications,
+        pages,
+      ) = await Database.getNotifications(categories, location, all, page);
+
+      logger.i("AdminRepository-getNotifications: Notificações encontradas",
+          time: DateTime.now());
+
+      await _close();
+      return (notifications, pages);
+    } catch (e) {
+      logger.e(
+        "AdminRepository-getNotifications: Erro buscando notificações => $e",
+        time: DateTime.now(),
+      );
+
+      await _close();
+      throw "AdminRepository-getNotifications: Erro buscando notificações => $e";
+    }
+  }
+}
+
 class AdminRepository {
   final logger = Logger();
 
@@ -83,11 +138,14 @@ class AdminRepository {
         await _sendEmail(emails, subject, body);
       }
 
+      DateTime now = DateTime.now();
+
       await _registerNotification(Notification(
         title: subject,
         text: body,
-        date: DateTime.now().toString().substring(0, 10),
-        time: DateTime.now().toString().substring(11, 16),
+        date:
+            '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}',
+        time: now.toString().substring(11, 16),
         location: location,
         categories: categories,
         users: users.isNotEmpty ? users.map((e) => e.name).toList() : [],

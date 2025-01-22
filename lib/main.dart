@@ -5,6 +5,7 @@ import 'package:meavisapp/domain/entities.dart';
 import 'package:meavisapp/pages/about.dart';
 import 'package:meavisapp/pages/admin.dart';
 import 'package:meavisapp/pages/home.dart';
+import 'package:meavisapp/pages/notifcations.dart';
 import 'package:meavisapp/pages/profile.dart';
 import 'package:meavisapp/pages/register.dart';
 import 'package:meavisapp/pages/login.dart';
@@ -18,6 +19,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AdminController()),
         ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(create: (_) => NotificationController()),
       ],
       child: MyApp(),
     ),
@@ -51,6 +53,7 @@ class MyPage extends StatefulWidget {
 class _MyPageState extends State<MyPage> {
   late AdminController adminController;
   late UserController userController;
+  late NotificationController notificationController;
   int _selectedIndex = 0;
   bool _isLoading = true;
   UserLogged? _userLogged;
@@ -61,6 +64,8 @@ class _MyPageState extends State<MyPage> {
     super.initState();
     adminController = Provider.of<AdminController>(context, listen: false);
     userController = Provider.of<UserController>(context, listen: false);
+    notificationController =
+        Provider.of<NotificationController>(context, listen: false);
     _simulateLoading();
     _onUserLogged();
   }
@@ -94,6 +99,17 @@ class _MyPageState extends State<MyPage> {
       isLogged = userController.isLogged;
       _userLogged = userController.userLogged;
     });
+  }
+
+  Widget _home() {
+    if (userController.isLogged) {
+      return NotificationHistory(
+        notificationController: notificationController,
+        userLogged: _userLogged!,
+      );
+    } else {
+      return Home(onRegister: _openRegisterPage);
+    }
   }
 
   Widget _profile() {
@@ -152,9 +168,7 @@ class _MyPageState extends State<MyPage> {
               child: Stack(
                 children: [
                   if (_selectedIndex == 0)
-                    Home(
-                      onRegister: _openRegisterPage,
-                    )
+                    _home()
                   else if (_selectedIndex == 1)
                     _profile()
                   else if (_selectedIndex == 2)

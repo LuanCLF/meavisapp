@@ -221,7 +221,7 @@ class _AdminState extends State<Admin> {
                               Theme.of(context).colorScheme.surface),
                           padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                               EdgeInsets.only(
-                                  left: 10, right: 10, top: 5, bottom: 5)),
+                                  left: 10, right: 10, top: 5, bottom: 10)),
                         ),
                       ),
                     ],

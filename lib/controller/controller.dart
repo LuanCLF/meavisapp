@@ -1,9 +1,87 @@
+import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:meavisapp/domain/entities.dart';
+import 'package:meavisapp/domain/entities.dart' as domain;
 import 'package:meavisapp/domain/interfaces.dart';
 import 'package:meavisapp/repository/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class NotificationController extends ChangeNotifier {
+  final NotificationRepository _notificationRepository =
+      NotificationRepository();
+  final _logger = Logger();
+
+  List<domain.Notification> notifications = [];
+  int pages = 0;
+
+  get notificationsCount => notifications.length;
+  get notificationsList => notifications;
+  get totalPages => pages;
+
+  Future<void> getNotifications(bool update, bool all, int page,
+      List<String> categories, String? location) async {
+    try {
+      if (update == false) await _getNotificationsFromPreferences();
+
+      if (notifications.isEmpty || update) {
+        List<domain.Notification> dbNotifications;
+        int dbCount;
+        (
+          dbNotifications,
+          dbCount,
+        ) = await _notificationRepository.getNotifications(
+            categories, location, all, page);
+
+        if (all == false) {
+          _saveInPreferences(notifications, dbCount);
+        }
+        _logger.i(
+            "NotificationController-getNotifications: Notificações encontradas no banco de dados e salvas",
+            time: DateTime.now());
+
+        notifications = dbNotifications;
+        pages = dbCount;
+      }
+
+      _logger.i(
+          "NotificationController-getNotifications: Notificações encontradas ${notifications.length}",
+          time: DateTime.now());
+      notifyListeners();
+    } catch (e) {
+      _logger.e(
+        "NotificationController-getNotifications: Erro buscando notificações => $e",
+        time: DateTime.now(),
+      );
+    }
+  }
+
+  Future<void> _saveInPreferences(
+      List<domain.Notification> notification, int dbCount) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String> notificationsJsonList = notifications
+        .map((notification) => jsonEncode(notification.toJson()))
+        .toList();
+
+    prefs.setStringList("NotificationsList", notificationsJsonList);
+    prefs.setInt("dbCount", dbCount);
+  }
+
+  Future<void> _getNotificationsFromPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String>? notificationsJsonList =
+        prefs.getStringList("NotificationsList");
+    int dbCount = prefs.getInt("dbCount")!;
+
+    notifications = notificationsJsonList!
+        .map((notification) =>
+            domain.Notification.fromJson(jsonDecode(notification)))
+        .toList();
+    pages = dbCount;
+  }
+}
 
 class AdminController extends ChangeNotifier {
   int totalUsers = 0;
@@ -64,8 +142,6 @@ class UserController extends ChangeNotifier {
   List<ICategory> categories = [];
   List<ILocation> locations = [];
   List<Iddd> ddds = [];
-
-  UserController();
 
   Future<(String, int)> registerUser(User user) async {
     try {
@@ -213,14 +289,8 @@ class UserController extends ChangeNotifier {
 
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove("id");
-    prefs.remove("name");
-    prefs.remove("categories");
-    prefs.remove("preferenceNotification");
-    prefs.remove("email");
-    prefs.remove("whatsapp");
-    prefs.remove("location");
-    prefs.remove("isAdmin");
+
+    prefs.clear();
 
     isLogged = false;
     userLogged = null;
@@ -234,7 +304,7 @@ class UserController extends ChangeNotifier {
     prefs.setString("categories", user.categories.toString());
     prefs.setString("preferenceNotification", user.preferenceNotification);
 
-    prefs.setBool("isAdmin", user.isAdmin!);
+    prefs.setBool("isAdmin", user.isAdmin == true);
 
     if (user.email != null) {
       prefs.setString("email", user.email!);

@@ -22,6 +22,66 @@ class Database {
     }
   }
 
+  static Future<(List<Notification>, int)> getNotifications(
+      List<String> categories, String? location, bool all, int page) async {
+    try {
+      if (_db == null || !_db!.isConnected) {
+        throw 'Banco de dados não conectado';
+      }
+
+      notificationCollection = _db!.collection("notifications");
+
+      if (notificationCollection == null) {
+        throw 'Conexão com notificationCollection falhou';
+      }
+
+      var query = <String, dynamic>{
+        'categories': {'\$in': categories}
+      };
+
+      if (location != null) {
+        query['location'] = location;
+      }
+
+      List<Notification> notifications;
+      int pages;
+
+      if (all) {
+        notifications = await notificationCollection!
+            .modernFind(
+              sort: {'date': -1},
+              skip: page > 0 ? 10 * page : null,
+              limit: 10,
+            )
+            .toList()
+            .then(
+                (value) => value.map((e) => Notification.fromJson(e)).toList());
+
+        pages = (await notificationCollection!.count() / 10).ceil();
+      } else {
+        notifications = await notificationCollection!
+            .modernFind(
+              filter: query,
+              sort: {'date': -1},
+              skip: page > 0 ? 10 * page : null,
+              limit: 10,
+            )
+            .toList()
+            .then(
+                (value) => value.map((e) => Notification.fromJson(e)).toList());
+
+        _logger.i('${await notificationCollection!.count(query)}');
+        pages = (await notificationCollection!.count(query) / 10).ceil();
+      }
+
+      Database._logger.i("Database: Notificações encontradas");
+      return (notifications, pages);
+    } catch (e) {
+      Database._logger.e("Database: Erro buscando notificações => $e");
+      throw 'Database: Erro buscando notificações => $e';
+    }
+  }
+
   static Future<void> insertNotification(Notification notification) async {
     try {
       notificationCollection = _db!.collection("notifications");
@@ -221,14 +281,12 @@ class Database {
         throw 'Conexão com userCollection falhou';
       }
 
-      // Construindo a consulta
-      var query = {
+      var query = <String, dynamic>{
         'categories': {'\$in': categories}
       };
+
       if (location != null) {
-        query['location'] = {
-          '\$eq': [location]
-        };
+        query['location'] = location;
       }
 
       List<UserNotification> usersNotifications = await userCollection!

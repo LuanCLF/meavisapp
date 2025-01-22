@@ -298,7 +298,7 @@ class _RegisterState extends State<Register> {
                                               left: 10,
                                               right: 10,
                                               top: 5,
-                                              bottom: 5)),
+                                              bottom: 10)),
                                     ),
                                   ),
                                   Column(
