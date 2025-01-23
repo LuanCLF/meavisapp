@@ -16,7 +16,7 @@ class _AboutState extends State<About> {
       await launchUrl(Uri(
         scheme: 'mailto',
         path: 'lclfdev@gmail.com',
-        query: 'subject=Contato&body=Olá',
+        query: 'subject=Contato&body=Olá, vi seu contato no MeAvisa',
       ));
     } catch (e) {
       logger.e(e);
@@ -27,8 +27,8 @@ class _AboutState extends State<About> {
     try {
       await launchUrl(Uri(
         scheme: 'https',
-        path: 'wa.me/5584987166835',
-        query: 'text=Olá',
+        path: 'wa.me/5584988198357',
+        query: 'text=Olá, vi seu contato no MeAvisa',
       ));
     } catch (e) {
       logger.e(e);
@@ -58,10 +58,10 @@ class _AboutState extends State<About> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 50,
+                  height: 100,
                 ),
                 Text(
-                  'Sobre',
+                  'Sobre o APP',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,

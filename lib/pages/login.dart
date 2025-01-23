@@ -186,13 +186,15 @@ class _LoginState extends State<Login> {
                               ],
                               initialSelection: defaultLogin == "email" ? 1 : 2,
                               onSelected: (value) {
-                                setState(() {
-                                  if (value == 1) {
-                                    defaultLogin = "email";
-                                  } else {
-                                    defaultLogin = "whatsapp";
-                                  }
-                                });
+                                if (_isLoading) {
+                                  setState(() {
+                                    if (value == 1) {
+                                      defaultLogin = "email";
+                                    } else {
+                                      defaultLogin = "whatsapp";
+                                    }
+                                  });
+                                }
                               },
                               inputDecorationTheme: InputDecorationTheme(
                                 border: OutlineInputBorder(
@@ -239,11 +241,13 @@ class _LoginState extends State<Login> {
                                 ),
                                 keyboardType: TextInputType.emailAddress,
                                 onChanged: (value) {
-                                  setState(() {
-                                    emailController.value = TextEditingValue(
-                                      text: value.replaceAll(" ", ""),
-                                    );
-                                  });
+                                  if (_isLoading) {
+                                    setState(() {
+                                      emailController.value = TextEditingValue(
+                                        text: value.replaceAll(" ", ""),
+                                      );
+                                    });
+                                  }
                                 },
                               ),
                               if (emailError != null)
@@ -270,9 +274,11 @@ class _LoginState extends State<Login> {
                                     initialSelection: ddd,
                                     width: 100,
                                     onSelected: (value) {
-                                      setState(() {
-                                        ddd = ddds[value - 1].label;
-                                      });
+                                      if (_isLoading) {
+                                        setState(() {
+                                          ddd = ddds[value - 1].label;
+                                        });
+                                      }
                                     },
                                     inputDecorationTheme: InputDecorationTheme(
                                       border: OutlineInputBorder(
@@ -298,10 +304,14 @@ class _LoginState extends State<Login> {
                                     child: TextFormField(
                                       controller: whatsappController,
                                       onChanged: (value) {
-                                        whatsappController.value =
-                                            TextEditingValue(
-                                          text: validateWhatsapp(value),
-                                        );
+                                        if (_isLoading) {
+                                          setState(() {
+                                            whatsappController.value =
+                                                TextEditingValue(
+                                              text: validateWhatsapp(value),
+                                            );
+                                          });
+                                        }
                                       },
                                       decoration: InputDecoration(
                                         labelText: "Whatsapp",
@@ -376,60 +386,60 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                             onPressed: () async {
-                              loading(true);
-                              try {
-                                validateEmail(null);
-                                validateWhatsapp(null);
-                                validatePassword(null);
+                              if (_isLoading == false) {
+                                loading(true);
+                                try {
+                                  validateEmail(null);
+                                  validateWhatsapp(null);
+                                  validatePassword(null);
 
-                                bool loginEmail = defaultLogin == "email" &&
-                                    emailError == null;
-                                bool loginWhatsapp =
-                                    defaultLogin == "whatsapp" &&
-                                        whatsappError == null;
+                                  bool loginEmail = defaultLogin == "email" &&
+                                      emailError == null;
+                                  bool loginWhatsapp =
+                                      defaultLogin == "whatsapp" &&
+                                          whatsappError == null;
 
-                                if ((loginEmail || loginWhatsapp) &&
-                                    passwordError == null) {
-                                  logger.i("LoginPage: Tentando logar");
+                                  if ((loginEmail || loginWhatsapp) &&
+                                      passwordError == null) {
+                                    logger.i("LoginPage: Tentando logar");
 
-                                  String message;
-                                  int code;
-                                  (message, code) =
-                                      await widget.userController.login(
-                                    defaultLogin == "email"
-                                        ? emailController.text
-                                        : "${ddd}9${whatsappController.text}",
-                                    defaultLogin,
-                                    passwordController.text,
-                                  );
+                                    String message;
+                                    int code;
+                                    (message, code) =
+                                        await widget.userController.login(
+                                      defaultLogin == "email"
+                                          ? emailController.text
+                                          : "${ddd}9${whatsappController.text}",
+                                      defaultLogin,
+                                      passwordController.text,
+                                    );
 
-                                  logger.i("LoginPage: $message");
+                                    logger.i("LoginPage: $message");
 
-                                  if (code == 200) {
-                                    widget.onLogin();
+                                    if (code == 200) {
+                                      widget.onLogin();
+                                    }
+
+                                    if (code != 200) {
+                                      setState(() {
+                                        loginError = message;
+                                      });
+                                    }
+                                  } else {
+                                    logger.e("LoginPage: Formulário inválido");
+                                    loginError =
+                                        "Preencha todos os campos corretamente";
                                   }
-
-                                  if (code != 200) {
-                                    setState(() {
-                                      loginError = message;
-                                    });
-                                  }
-
-                                  if (code == 500) throw message;
-                                } else {
-                                  logger.e("LoginPage: Formulário inválido");
-                                  loginError =
-                                      "Preencha todos os campos corretamente";
+                                } catch (e) {
+                                  logger.e("LoginPage: Erro no login => $e");
+                                  setState(() {
+                                    loginError =
+                                        "Erro acessando os dados, por favor entre em contato com a equipe";
+                                  });
                                 }
-                              } catch (e) {
-                                logger.e("LoginPage: Erro no login => $e");
-                                setState(() {
-                                  loginError =
-                                      "Erro acessando os dados, por favor entre em contato com a equipe";
-                                });
-                              }
 
-                              loading(false);
+                                loading(false);
+                              }
                             },
                             child: _isLoading
                                 ? CircularProgressIndicator(

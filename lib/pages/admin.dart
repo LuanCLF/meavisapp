@@ -175,9 +175,11 @@ class _AdminState extends State<Admin> {
                               value:
                                   notificationCategory.contains(category.label),
                               onChanged: (value) {
-                                setState(() {
-                                  validateCategory(value == true, category);
-                                });
+                                if (_isLoading == false) {
+                                  setState(() {
+                                    validateCategory(value == true, category);
+                                  });
+                                }
                               },
                             ),
                             Text(category.label),
@@ -207,9 +209,11 @@ class _AdminState extends State<Admin> {
                         initialSelection: notificationLocation,
                         width: 190,
                         onSelected: (value) {
-                          setState(() {
-                            notificationLocation = locations[value - 1].label;
-                          });
+                          if (_isLoading == false) {
+                            setState(() {
+                              notificationLocation = locations[value - 1].label;
+                            });
+                          }
                         },
                         inputDecorationTheme: InputDecorationTheme(
                           border: OutlineInputBorder(
@@ -253,11 +257,13 @@ class _AdminState extends State<Admin> {
                     ),
                     keyboardType: TextInputType.text,
                     onChanged: (value) {
-                      setState(() {
-                        titleController.value = TextEditingValue(
-                          text: value,
-                        );
-                      });
+                      if (_isLoading == false) {
+                        setState(() {
+                          titleController.value = TextEditingValue(
+                            text: value,
+                          );
+                        });
+                      }
                     },
                   ),
                   if (errors.contains("title"))
@@ -348,54 +354,51 @@ class _AdminState extends State<Admin> {
                                 ),
                               ),
                               onPressed: () async {
-                                try {
-                                  setState(() {
-                                    errors.remove("form");
-                                    successMessage = null;
-                                  });
-                                  validatePreferenceCategory();
-                                  validateTitle();
-                                  validateText();
-
-                                  if (errors.isEmpty) {
+                                if (_isLoading == false) {
+                                  try {
                                     loading(true);
+                                    setState(() {
+                                      errors.remove("form");
+                                      successMessage = null;
+                                    });
+                                    validatePreferenceCategory();
+                                    validateTitle();
+                                    validateText();
 
-                                    logger.i("AdminPage: Formulário válido");
+                                    if (errors.isEmpty) {
+                                      logger.i("AdminPage: Formulário válido");
 
-                                    String message;
-                                    int code;
+                                     
+                                      int code;
 
-                                    (message, code) = await widget
-                                        .adminController
-                                        .sendNotification(
-                                            notificationCategory,
-                                            notificationLocation,
-                                            titleController.text,
-                                            textController.text);
+                                      (_, code) = await widget
+                                          .adminController
+                                          .sendNotification(
+                                              notificationCategory,
+                                              notificationLocation,
+                                              titleController.text,
+                                              textController.text);
 
-                                    if (code == 204) {
-                                      setState(() {
-                                        successMessage =
-                                            "Notificação enviada com sucesso!";
-                                      });
+                                      if (code == 204) {
+                                        setState(() {
+                                          successMessage =
+                                              "Notificação enviada com sucesso!";
+                                        });
+                                      }
+                                    } else {
+                                      logger.e(
+                                          "AdminPage: Formulário inválido => $errors");
+
+                                      registerErrorF(
+                                          "Preencha todos os campos corretamente");
                                     }
-
-                                    if (code == 500) {
-                                      registerErrorF(message);
-                                    }
-                                  } else {
-                                    logger.e(
-                                        "AdminPage: Formulário inválido => $errors");
-
+                                  } catch (e) {
+                                    logger.e("AdminPage: Erro no envio => $e");
                                     registerErrorF(
-                                        "Preencha todos os campos corretamente");
+                                        "Erro enviando notificação, por favor entre em contato com a equipe");
                                   }
-                                } catch (e) {
-                                  logger.e("AdminPage: Erro no envio => $e");
-                                  registerErrorF(
-                                      "Erro enviando notificação, por favor entre em contato com a equipe");
+                                  loading(false);
                                 }
-                                loading(false);
                               },
                               child: _isLoading
                                   ? CircularProgressIndicator(

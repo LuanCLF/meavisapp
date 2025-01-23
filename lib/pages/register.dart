@@ -242,10 +242,12 @@ class _RegisterState extends State<Register> {
                                           value: userPreferenceCategory
                                               .contains(category.label),
                                           onChanged: (value) {
-                                            setState(() {
-                                              validateCategory(
-                                                  value == true, category);
-                                            });
+                                            if (_isLoading == false) {
+                                              setState(() {
+                                                validateCategory(
+                                                    value == true, category);
+                                              });
+                                            }
                                           },
                                         ),
                                         Text(category.label),
@@ -276,10 +278,12 @@ class _RegisterState extends State<Register> {
                                     initialSelection: userLocation,
                                     width: 190,
                                     onSelected: (value) {
-                                      setState(() {
-                                        userLocation =
-                                            locations[value - 1].label;
-                                      });
+                                      if (_isLoading == false) {
+                                        setState(() {
+                                          userLocation =
+                                              locations[value - 1].label;
+                                        });
+                                      }
                                     },
                                     inputDecorationTheme: InputDecorationTheme(
                                       border: OutlineInputBorder(
@@ -313,12 +317,14 @@ class _RegisterState extends State<Register> {
                                                   "email",
                                               semanticLabel: "Email",
                                               onChanged: (value) {
-                                                setState(() {
-                                                  preferenceNotification =
-                                                      value == true
-                                                          ? "email"
-                                                          : "whatsapp";
-                                                });
+                                                if (_isLoading == false) {
+                                                  setState(() {
+                                                    preferenceNotification =
+                                                        value == true
+                                                            ? "email"
+                                                            : "whatsapp";
+                                                  });
+                                                }
                                               }),
                                           Text("Email"),
                                         ],
@@ -333,12 +339,14 @@ class _RegisterState extends State<Register> {
                                                   "whatsapp",
                                               semanticLabel: "Whatsapp",
                                               onChanged: (value) {
-                                                setState(() {
-                                                  preferenceNotification =
-                                                      value == true
-                                                          ? "whatsapp"
-                                                          : "email";
-                                                });
+                                                if (_isLoading == false) {
+                                                  setState(() {
+                                                    preferenceNotification =
+                                                        value == true
+                                                            ? "whatsapp"
+                                                            : "email";
+                                                  });
+                                                }
                                               }),
                                           Text("Whatsapp"),
                                         ],
@@ -373,7 +381,7 @@ class _RegisterState extends State<Register> {
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  setState(() {
+                                  if (_isLoading == false) {
                                     value =
                                         value.replaceAll(RegExp(r'\s+'), ' ');
 
@@ -382,7 +390,7 @@ class _RegisterState extends State<Register> {
                                     nameController.value = TextEditingValue(
                                       text: value,
                                     );
-                                  });
+                                  }
                                 },
                               ),
                               if (errors.contains("name"))
@@ -420,15 +428,17 @@ class _RegisterState extends State<Register> {
                                 ),
                                 keyboardType: TextInputType.emailAddress,
                                 onChanged: (value) {
-                                  setState(() {
-                                    value = value.replaceAll(" ", "");
+                                  if (_isLoading == false) {
+                                    setState(() {
+                                      value = value.replaceAll(" ", "");
 
-                                    validateEmail(value);
+                                      validateEmail(value);
 
-                                    emailController.value = TextEditingValue(
-                                      text: value,
-                                    );
-                                  });
+                                      emailController.value = TextEditingValue(
+                                        text: value,
+                                      );
+                                    });
+                                  }
                                 },
                               ),
                               if (errors.contains("email"))
@@ -454,9 +464,11 @@ class _RegisterState extends State<Register> {
                                     initialSelection: ddd,
                                     width: 100,
                                     onSelected: (value) {
-                                      setState(() {
-                                        ddd = ddds[value - 1].label;
-                                      });
+                                      if (_isLoading == false) {
+                                        setState(() {
+                                          ddd = ddds[value - 1].label;
+                                        });
+                                      }
                                     },
                                     inputDecorationTheme: InputDecorationTheme(
                                       border: OutlineInputBorder(
@@ -482,10 +494,14 @@ class _RegisterState extends State<Register> {
                                     child: TextFormField(
                                       controller: whatsappController,
                                       onChanged: (value) {
-                                        whatsappController.value =
-                                            TextEditingValue(
-                                          text: validateWhatsapp(value),
-                                        );
+                                        if (_isLoading == false) {
+                                          setState(() {
+                                            whatsappController.value =
+                                                TextEditingValue(
+                                              text: validateWhatsapp(value),
+                                            );
+                                          });
+                                        }
                                       },
                                       decoration: InputDecoration(
                                         labelText: "Whatsapp",
@@ -536,9 +552,11 @@ class _RegisterState extends State<Register> {
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  setState(() {
-                                    validatePassword(value);
-                                  });
+                                  if (_isLoading == false) {
+                                    setState(() {
+                                      validatePassword(value);
+                                    });
+                                  }
                                 },
                               ),
                               if (errors.contains("password"))
@@ -565,70 +583,67 @@ class _RegisterState extends State<Register> {
                                     ),
                                   ),
                                   onPressed: () async {
-                                    try {
-                                      registerErrorF(null);
-                                      validatePreferenceCategory();
-                                      validateName(null);
-                                      validateEmail(null);
-                                      validateWhatsapp(null);
-                                      validatePassword(null);
+                                    if (_isLoading == false) {
+                                      loading(true);
+                                      try {
+                                        registerErrorF(null);
+                                        validatePreferenceCategory();
+                                        validateName(null);
+                                        validateEmail(null);
+                                        validateWhatsapp(null);
+                                        validatePassword(null);
 
-                                      if (errors.isEmpty) {
-                                        loading(true);
+                                        if (errors.isEmpty) {
+                                          logger.i(
+                                              "RegisterPage: Formulário válido");
+                                          String? emailC =
+                                              emailController.text.isEmpty
+                                                  ? null
+                                                  : emailController.text;
 
-                                        logger.i(
-                                            "RegisterPage: Formulário válido");
-                                        String? emailC =
-                                            emailController.text.isEmpty
-                                                ? null
-                                                : emailController.text;
+                                          String? whatsappC = whatsappController
+                                                  .text.isEmpty
+                                              ? null
+                                              : "${ddd}9${whatsappController.text}";
 
-                                        String? whatsappC = whatsappController
-                                                .text.isEmpty
-                                            ? null
-                                            : "${ddd}9${whatsappController.text}";
+                                          String message;
+                                          int code;
+                                          (message, code) = await widget
+                                              .userController
+                                              .registerUser(User(
+                                            name: formatName().trim(),
+                                            email: emailC,
+                                            whatsapp: whatsappC,
+                                            password: passwordController.text,
+                                            categories: userPreferenceCategory,
+                                            location: userLocation,
+                                            preferenceNotification:
+                                                preferenceNotification,
+                                          ));
 
-                                        String message;
-                                        int code;
-                                        (message, code) = await widget
-                                            .userController
-                                            .registerUser(User(
-                                          name: formatName().trim(),
-                                          email: emailC,
-                                          whatsapp: whatsappC,
-                                          password: passwordController.text,
-                                          categories: userPreferenceCategory,
-                                          location: userLocation,
-                                          preferenceNotification:
-                                              preferenceNotification,
-                                        ));
+                                          if (code == 201) {
+                                            widget.onSave(widget
+                                                .userController.userLogged!);
+                                          }
 
-                                        if (code == 201) {
-                                          widget.onSave(widget
-                                              .userController.userLogged!);
+                                          if (code == 409) {
+                                            registerErrorF(message);
+                                          }
+                                        } else {
+                                          logger.e(
+                                              "RegisterPage: Formulário inválido => $errors");
+
+                                          registerErrorF(
+                                              "Preencha todos os campos corretamente");
                                         }
-
-                                        if (code == 409) {
-                                          registerErrorF(message);
-                                        }
-
-                                        if (code == 500) {
-                                          registerErrorF(message);
-                                        }
-                                      } else {
+                                      } catch (e) {
                                         logger.e(
-                                            "RegisterPage: Formulário inválido => $errors");
-
+                                            "RegisterPage: Erro no cadastro => $e");
                                         registerErrorF(
-                                            "Preencha todos os campos corretamente");
+                                            "Erro cadastrando dados, por favor entre em contato com a equipe");
                                       }
-                                    } catch (e) {
-                                      logger.e(
-                                          "RegisterPage: Erro no cadastro => $e");
-                                      registerErrorF(
-                                          "Erro cadastrando dados, por favor entre em contato com a equipe");
+                                      loading(false);
                                     }
-                                    loading(false);
                                   },
                                   child: _isLoading
                                       ? CircularProgressIndicator(

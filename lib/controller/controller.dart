@@ -105,7 +105,8 @@ class AdminController extends ChangeNotifier {
         "AdminController-sendNotification: Erro enviando notificação => $e",
         time: DateTime.now(),
       );
-      return ("Erro enviando notificação", 500);
+
+      throw Exception(e);
     }
   }
 
@@ -177,7 +178,8 @@ class UserController extends ChangeNotifier {
         "UserController-registerUser: Erro registrando usuário => $e",
         time: DateTime.now(),
       );
-      return ("Erro registrando usuário", 500);
+
+      throw Exception(e);
     }
   }
 
@@ -235,6 +237,7 @@ class UserController extends ChangeNotifier {
       _logger.i("UserController-login: Usuário logado", time: DateTime.now());
 
       isLogged = true;
+      notifyListeners();
       return ("Usuário logado", 200);
     } catch (e) {
       _logger.e(
@@ -243,9 +246,8 @@ class UserController extends ChangeNotifier {
       );
 
       isLogged = false;
-      return ("Erro buscando usuário", 500);
-    } finally {
       notifyListeners();
+      throw Exception(e);
     }
   }
 

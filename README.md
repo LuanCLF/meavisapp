@@ -2,6 +2,10 @@
 
 MEAVISA é um aplicativo móvel desenvolvido para conectar cidadãos e administrações municipais de forma eficiente e prática.
 
+## Licença
+
+Este projeto está licenciado sob a licença Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International. Para mais detalhes, veja o arquivo [LICENSE](LICENSE).
+
 ## **Sumário** 📗
 
 1. [Descrição do Projeto 📃](#descrição-)
