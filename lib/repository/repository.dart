@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
@@ -63,6 +66,7 @@ class NotificationRepository {
 
 class AdminRepository {
   final logger = Logger();
+  final htppAdmin = HttpClient();
 
   Future<void> _init() async {
     try {
@@ -132,10 +136,18 @@ class AdminRepository {
   Future<void> sendNotification(List<UserNotification> users, String subject,
       String body, List<String> categories, String? location) async {
     try {
-      if (users.isNotEmpty) {
-        List<String> emails = users.map((e) => e.email!).toList();
+      List<String> userNames = [];
+      List<String> emails = [];
+      List<String> phones = [];
 
-        await _sendEmail(emails, subject, body);
+      for (UserNotification user in users) {
+        userNames.add(user.name);
+        if (user.email != null && user.email!.isNotEmpty) {
+          emails.add(user.email!);
+        }
+        if (user.whatsapp != null && user.whatsapp!.isNotEmpty) {
+          phones.add(user.whatsapp!);
+        }
       }
 
       DateTime now = DateTime.now();
@@ -148,8 +160,12 @@ class AdminRepository {
         time: now.toString().substring(11, 16),
         location: location,
         categories: categories,
-        users: users.isNotEmpty ? users.map((e) => e.name).toList() : [],
+        users: userNames.isNotEmpty ? userNames : [],
       ));
+
+      if (emails.isNotEmpty) await _sendEmail(emails, subject, body);
+
+      if (phones.isNotEmpty) await _sendWhatsApp(phones, body);
 
       logger.i("AdminRepository-sendNotification: Notificação enviada",
           time: DateTime.now());
@@ -192,6 +208,28 @@ class AdminRepository {
     } on MailerException catch (e) {
       logger.i('AdminRepository-_sendEmail: Erro enviando email => $e');
       throw 'AdminRepository-_sendEmail: Erro enviando email => $e';
+    }
+  }
+
+  Future<void> _sendWhatsApp(List<String> phones, String body) async {
+    for (String phone in phones) {
+      try {
+        final uri = Uri.parse(
+            "https://hook.us2.make.com/drc4kg7u5w73kqc9ja6hkwjcwyjksmuy");
+        final request = await htppAdmin.postUrl(uri);
+        request.headers.set('Content-Type', 'application/json');
+        request.add(utf8.encode(jsonEncode({
+          'to': '55${phone.replaceAll('-', '').trim()}',
+          'message': body,
+        })));
+
+        await request.close();
+
+        logger.i(
+            'AdminRepository-_sendWhatsApp: Whatsapp enviado - $phone - ${DateTime.now()}');
+      } catch (e) {
+        logger.e('AdminRepository-_sendWhatsApp: Erro enviando whatsapp => $e');
+      }
     }
   }
 }

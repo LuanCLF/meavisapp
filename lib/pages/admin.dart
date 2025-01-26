@@ -144,7 +144,7 @@ class _AdminState extends State<Admin> {
             spacing: 20,
             children: [
               SizedBox(
-                height: 100,
+                height: 50,
               ),
               Text(
                 'Nova Notificação',
@@ -368,11 +368,9 @@ class _AdminState extends State<Admin> {
                                     if (errors.isEmpty) {
                                       logger.i("AdminPage: Formulário válido");
 
-                                     
                                       int code;
 
-                                      (_, code) = await widget
-                                          .adminController
+                                      (_, code) = await widget.adminController
                                           .sendNotification(
                                               notificationCategory,
                                               notificationLocation,

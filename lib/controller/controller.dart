@@ -73,13 +73,14 @@ class NotificationController extends ChangeNotifier {
 
     List<String>? notificationsJsonList =
         prefs.getStringList("NotificationsList");
-    int dbCount = prefs.getInt("dbCount")!;
+    int? dbCount = prefs.getInt("dbCount");
 
-    notifications = notificationsJsonList!
-        .map((notification) =>
-            domain.Notification.fromJson(jsonDecode(notification)))
-        .toList();
-    pages = dbCount;
+    notifications = notificationsJsonList
+            ?.map((notification) =>
+                domain.Notification.fromJson(jsonDecode(notification)))
+            .toList() ??
+        [];
+    pages = dbCount ?? 0;
   }
 }
 

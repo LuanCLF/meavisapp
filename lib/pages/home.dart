@@ -14,10 +14,10 @@ class Home extends StatelessWidget {
             width: 400,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              spacing: 40,
+              spacing: 35,
               children: <Widget>[
                 SizedBox(
-                  height: 20,
+                  height: 50,
                 ),
                 Text(
                   'MEAVISA',
