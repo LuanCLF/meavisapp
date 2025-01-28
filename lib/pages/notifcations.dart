@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:meavisapp/controller/controller.dart';
-import 'package:meavisapp/domain/entities.dart';
+import 'package:meavisa/controller/controller.dart';
+import 'package:meavisa/domain/entities.dart';
 import 'package:provider/provider.dart';
 
 class NotificationHistory extends StatefulWidget {

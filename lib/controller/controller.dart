@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:logger/logger.dart';
-import 'package:meavisapp/domain/entities.dart';
-import 'package:meavisapp/domain/entities.dart' as domain;
-import 'package:meavisapp/domain/interfaces.dart';
-import 'package:meavisapp/repository/repository.dart';
+import 'package:meavisa/domain/entities.dart';
+import 'package:meavisa/domain/entities.dart' as domain;
+import 'package:meavisa/domain/interfaces.dart';
+import 'package:meavisa/repository/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

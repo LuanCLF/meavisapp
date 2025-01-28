@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:meavisapp/controller/controller.dart';
-import 'package:meavisapp/domain/entities.dart';
+import 'package:meavisa/controller/controller.dart';
+import 'package:meavisa/domain/entities.dart';
 
 class Login extends StatefulWidget {
   final VoidCallback onRegister;

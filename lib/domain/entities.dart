@@ -1,4 +1,4 @@
-import 'package:meavisapp/domain/interfaces.dart';
+import 'package:meavisa/domain/interfaces.dart';
 
 class Notification implements INotification {
   @override

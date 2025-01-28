@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
-import 'package:meavisapp/controller/controller.dart';
-import 'package:meavisapp/domain/entities.dart';
-import 'package:meavisapp/pages/about.dart';
-import 'package:meavisapp/pages/admin.dart';
-import 'package:meavisapp/pages/home.dart';
-import 'package:meavisapp/pages/notifcations.dart';
-import 'package:meavisapp/pages/profile.dart';
-import 'package:meavisapp/pages/register.dart';
-import 'package:meavisapp/pages/login.dart';
+import 'package:meavisa/controller/controller.dart';
+import 'package:meavisa/domain/entities.dart';
+import 'package:meavisa/pages/about.dart';
+import 'package:meavisa/pages/admin.dart';
+import 'package:meavisa/pages/home.dart';
+import 'package:meavisa/pages/notifcations.dart';
+import 'package:meavisa/pages/profile.dart';
+import 'package:meavisa/pages/register.dart';
+import 'package:meavisa/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 

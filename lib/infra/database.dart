@@ -1,6 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
-import 'package:meavisapp/domain/entities.dart';
+import 'package:meavisa/domain/entities.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class Database {
