@@ -212,24 +212,22 @@ class AdminRepository {
   }
 
   Future<void> _sendWhatsApp(List<String> phones, String body) async {
-    for (String phone in phones) {
-      try {
-        final uri = Uri.parse(
-            "https://hook.us2.make.com/drc4kg7u5w73kqc9ja6hkwjcwyjksmuy");
-        final request = await htppAdmin.postUrl(uri);
-        request.headers.set('Content-Type', 'application/json');
-        request.add(utf8.encode(jsonEncode({
-          'to': '55${phone.replaceAll('-', '').trim()}',
-          'message': body,
-        })));
+    try {
+      final uri = Uri.parse(
+          "https://hook.us2.make.com/drc4kg7u5w73kqc9ja6hkwjcwyjksmuy");
+      final request = await htppAdmin.postUrl(uri);
+      request.headers.set('Content-Type', 'application/json');
+      request.add(utf8.encode(jsonEncode({
+        'message': body,
+        'phones':
+            phones.map((p) => '55${p.replaceAll('-', '').trim()}').toList(),
+      })));
 
-        await request.close();
+      await request.close();
 
-        logger.i(
-            'AdminRepository-_sendWhatsApp: Whatsapp enviado - $phone - ${DateTime.now()}');
-      } catch (e) {
-        logger.e('AdminRepository-_sendWhatsApp: Erro enviando whatsapp => $e');
-      }
+      logger.i('AdminRepository-_sendWhatsApp: Whatsapp enviado');
+    } catch (e) {
+      logger.e('AdminRepository-_sendWhatsApp: Erro enviando whatsapp => $e');
     }
   }
 }
