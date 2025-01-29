@@ -235,8 +235,9 @@ class _ProfileState extends State<Profile> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Row(
-                        spacing: 40,
+                        spacing: 30,
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,16 +275,20 @@ class _ProfileState extends State<Profile> {
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
                             spacing: 20,
                             children: [
                               DropdownMenu(
                                 label: userLocation == null
                                     ? const Text("Bairro")
-                                    : Text(userLocation!),
+                                    : Text(
+                                        userLocation!,
+                                        style: TextStyle(
+                                          height: 1.2,
+                                        ),
+                                      ),
                                 dropdownMenuEntries: locations,
                                 initialSelection: userLocation,
-                                width: 195,
+                                width: 165,
                                 onSelected: (value) {
                                   if (_isLoading == false) {
                                     setState(() {
@@ -330,9 +335,6 @@ class _ProfileState extends State<Profile> {
                                           }),
                                       Text("Email"),
                                     ],
-                                  ),
-                                  SizedBox(
-                                    width: 15,
                                   ),
                                   Row(
                                     children: [

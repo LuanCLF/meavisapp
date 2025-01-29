@@ -463,6 +463,7 @@ class _LoginState extends State<Login> {
                         if (loginError != null)
                           Text(
                             loginError!,
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.error,
                               fontSize: 12,

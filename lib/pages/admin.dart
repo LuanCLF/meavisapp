@@ -161,8 +161,9 @@ class _AdminState extends State<Admin> {
                     fontSize: 16,
                   )),
               Row(
-                spacing: 20,
+                spacing: 30,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,16 +199,20 @@ class _AdminState extends State<Admin> {
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     spacing: 20,
                     children: [
                       DropdownMenu(
                         label: notificationLocation == null
                             ? const Text("Bairro")
-                            : Text(notificationLocation!),
+                            : Text(
+                                notificationLocation!,
+                                style: TextStyle(
+                                  height: 1.2,
+                                ),
+                              ),
                         dropdownMenuEntries: locations,
                         initialSelection: notificationLocation,
-                        width: 190,
+                        width: 165,
                         onSelected: (value) {
                           if (_isLoading == false) {
                             setState(() {

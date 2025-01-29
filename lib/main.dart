@@ -50,7 +50,9 @@ class MyPage extends StatefulWidget {
   State<MyPage> createState() => _MyPageState();
 }
 
-class _MyPageState extends State<MyPage> {
+class _MyPageState extends State<MyPage> with WidgetsBindingObserver {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
   late AdminController adminController;
   late UserController userController;
   late NotificationController notificationController;
@@ -62,12 +64,30 @@ class _MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     adminController = Provider.of<AdminController>(context, listen: false);
     userController = Provider.of<UserController>(context, listen: false);
     notificationController =
         Provider.of<NotificationController>(context, listen: false);
     _simulateLoading();
     _onUserLogged();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _navigatorKey.currentState?.pushReplacement(
+          MaterialPageRoute(builder: (context) => const MyPage()),
+        );
+      });
+    }
   }
 
   void _simulateLoading() async {
@@ -186,7 +206,6 @@ class _MyPageState extends State<MyPage> {
                         _onItemTapped(1);
                       },
                     )
-                  // Substitua por sua outra página
                 ],
               ),
             ),
